@@ -1,0 +1,29 @@
+meta {
+  name: 06 - Listar solo egresos de Luis
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/egresos?anio=2026&mes=5
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{luisToken}}
+}
+
+tests {
+  test("El listado de Luis no contiene el egreso de Ana", function () {
+    expect(res.getStatus()).to.equal(200);
+    const contieneEgresoAna = res.getBody().some(
+      (item) => item.id === Number(bru.getVar("egresoAnaId"))
+    );
+    expect(contieneEgresoAna).to.equal(false);
+  });
+}

@@ -1,0 +1,26 @@
+meta {
+  name: 07 - Ana sí ve su egreso
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/egresos/{{egresoAnaId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+tests {
+  test("Ana puede consultar su propio registro", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().id).to.equal(Number(bru.getVar("egresoAnaId")));
+  });
+}

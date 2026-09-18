@@ -1,0 +1,41 @@
+meta {
+  name: 03 - Crear egreso de Ana
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/egresos
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+body:json {
+  {
+    "categoria_id": {{categoriaEgresoId}},
+    "subcategoria_id": {{subcategoriaEgresoId}},
+    "fecha": "2026-05-18",
+    "descripcion": "Internet para prueba de aislamiento",
+    "monto": "125.50",
+    "notas": "Creado desde Bruno"
+  }
+}
+
+script:post-response {
+  bru.setVar("egresoAnaId", res.getBody().id);
+}
+
+tests {
+  test("El egreso se crea para Ana", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(bru.getVar("egresoAnaId")).to.exist;
+  });
+}

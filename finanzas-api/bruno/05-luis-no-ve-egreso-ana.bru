@@ -1,0 +1,25 @@
+meta {
+  name: 05 - Luis no ve el egreso de Ana
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/egresos/{{egresoAnaId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{luisToken}}
+}
+
+tests {
+  test("La API oculta el registro ajeno con 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

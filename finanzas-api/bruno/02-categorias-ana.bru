@@ -1,0 +1,34 @@
+meta {
+  name: 02 - Categorías de Ana
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/categorias?tipo=egreso
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+script:post-response {
+  const vivienda = res.getBody().find((item) => item.nombre === "Vivienda");
+  const internet = vivienda.subcategorias.find((item) => item.nombre === "Internet");
+  bru.setVar("categoriaEgresoId", vivienda.id);
+  bru.setVar("subcategoriaEgresoId", internet.id);
+}
+
+tests {
+  test("El catálogo incluye Vivienda e Internet", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(bru.getVar("categoriaEgresoId")).to.exist;
+    expect(bru.getVar("subcategoriaEgresoId")).to.exist;
+  });
+}
