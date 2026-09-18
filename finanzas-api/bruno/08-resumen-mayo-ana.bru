@@ -1,0 +1,29 @@
+meta {
+  name: 08 - Resumen de mayo de Ana
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/dashboard/resumen?anio=2026&mes=5
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+tests {
+  test("El dashboard devuelve el resumen mensual", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("ingresos_mes");
+    expect(res.getBody()).to.have.property("egresos_mes");
+    expect(res.getBody()).to.have.property("balance_mes");
+    expect(res.getBody()).to.have.property("balance_acumulado");
+  });
+}

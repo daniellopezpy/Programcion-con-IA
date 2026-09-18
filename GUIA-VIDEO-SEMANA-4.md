@@ -19,7 +19,7 @@ Duración objetivo: aproximadamente 3 minutos.
 
 - Abrir la colección `Finanzas API` y seleccionar el ambiente `Local`.
 - Ejecutar primero `01-login-ana` para obtener el token.
-- Ejecutar `02-categorias-ana` o `07-ana-si-ve-su-egreso` y mostrar el código `200` y la respuesta JSON.
+- Ejecutar `08-resumen-mayo-ana` y mostrar el código `200` y la respuesta JSON del dashboard.
 - Explicar que Bruno actúa como un cliente: envía la solicitud a Laravel y permite inspeccionar la respuesta.
 
 ## 2:20–3:00 — Base de datos y reto
