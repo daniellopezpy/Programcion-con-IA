@@ -13,6 +13,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function user(Request $request): JsonResponse
+    {
+        return response()->json($request->user());
+    }
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create($request->validated());

@@ -38,10 +38,40 @@ El tutor implementa lo solicitado por el documento, explica cada bloque y valida
 - P4.5: prueba específica que impide incluir julio en el acumulado de mayo.
 - Cada endpoint del dashboard usa una sola consulta SQL y filtra por el usuario autenticado.
 - Documentación y SQL equivalente: finanzas-api/docs/DASHBOARD.md.
-- Verificación actual: 20 pruebas PHP, 92 aserciones; 7 de 7 pruebas Bruno aprobadas.
+- Verificación del backend: 20 pruebas PHP, 92 aserciones; el estado más reciente comunicado incluye 8 de 8 solicitudes Bruno aprobadas.
 
-## Pendiente
-- Instalar Bruno antes del bloque de pruebas; a cargo del tutor.
+## Pendiente antes de Semana 6
 - Revisar y decidir las correcciones de la auditoría P3.6.
-- Instalar la aplicación gráfica de Bruno si se requiere usar su interfaz.
 - El esquema-bd.sql de referencia no se ha proporcionado.
+
+## Semana 6 - continuidad (2026-09-21)
+
+### Backend previo
+- El backend de Laravel de semanas 2 a 4 está implementado en `finanzas-api`.
+- El estado más reciente comunicado durante la preparación de la demostración es 20 pruebas PHP aprobadas y 8 solicitudes Bruno aprobadas. La cifra de 7/7 indicada arriba quedó desactualizada.
+- Bruno ya fue instalado y usado para validar inicio de sesión y resumen mensual; quitarlo de pendientes.
+- El backend y el frontend deben permanecer como repositorios separados, según la guía de Semana 6.
+
+### Semana 6: frontend React
+- [x] Frontend separado en `finanzas-web`, con Vite y React en JavaScript/JSX (sin TypeScript), y repositorio Git propio.
+- [x] P6.1: Tailwind CSS v4 y su plugin Vite, alias `@` en Vite/jsconfig, configuración de componentes JavaScript y botón compartido.
+- [x] P6.2: cliente API con URL configurable, Bearer token, GET/POST/PUT/DELETE, respuestas 204, mensajes de error y eliminación de sesión en 401.
+- [x] P6.3: registro/login/logout y restauración/validación de sesión con `/api/user`.
+- [x] P6.4: React Router con rutas públicas y protegidas, layout de autenticación y navegación privada.
+- [x] P6.5: panel, listas de ingresos y egresos; filtros mensuales y estados de carga, error y lista vacía.
+- [x] P6.6: formulario de creación/edición de egresos, selección de categoría/subcategoría y errores de validación del backend.
+- [x] P6.7: revisión de rutas, aislamiento de la sesión y sincronía de endpoints; agregado `GET /api/user` protegido para validar tokens al recargar.
+- [x] P6.8: README con instalación, ejecución, proxy local, build y advertencia sobre secretos `VITE_`.
+- [x] Verificación frontend: `pnpm lint` y `pnpm build` completados correctamente.
+- [x] Registro abierto en navegador sin errores de consola; proxy Vite→Laravel verificado y `/api/user` exige autenticación (401 sin token).
+- [x] Entorno local reactivado: MySQL escucha en `127.0.0.1:3306`, Laravel en `127.0.0.1:8000` y Vite en `localhost:5173`.
+- [x] Verificación backend repetida: 20 pruebas aprobadas, 92 aserciones.
+- [ ] Recorrer login y operaciones autenticadas contra MySQL con una sesión válida desde la interfaz.
+
+### Para retomar
+- El frontend vive en `finanzas-web`; el backend Laravel sigue en `finanzas-api`, ambos repositorios independientes.
+- No explicar el código durante la ejecución salvo que el usuario lo pida; realizar cambios y reservar la explicación para cuando la solicite.
+- Reglas conservadas: montos como cadenas decimales, fecha como fuente del mes, consultas filtradas por el usuario autenticado y validación en Form Requests Laravel.
+- [x] Se creó `finanzas.code-workspace` para abrir backend y frontend juntos en Visual Studio Code.
+- [x] El repositorio del frontend quedó reconocido por Git/VS Code como repositorio local independiente.
+- [ ] Conectar el repositorio a GitHub: falta definir o confirmar la URL del repositorio remoto antes de publicar.

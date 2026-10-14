@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "Backend Laravel + Bruno",
+      "path": "finanzas-api"
+    },
+    {
+      "name": "Frontend React",
+      "path": "finanzas-web"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.tools": true,
+      "**/node_modules": true,
+      "**/vendor": true,
+      "**/storage/framework/cache": true,
+      "**/storage/framework/sessions": true,
+      "**/storage/framework/views": true
+    }
+  }
+}
