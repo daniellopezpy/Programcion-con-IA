@@ -69,9 +69,9 @@ El tutor implementa lo solicitado por el documento, explica cada bloque y valida
 - [ ] Recorrer login y operaciones autenticadas contra MySQL con una sesión válida desde la interfaz.
 
 ### Para retomar
-- El frontend vive en `finanzas-web`; el backend Laravel sigue en `finanzas-api`, ambos repositorios independientes.
+- El frontend vive en `finanzas-web` y el backend Laravel en `finanzas-api`, dentro del repositorio público `daniellopezpy/Programcion-con-IA`.
 - No explicar el código durante la ejecución salvo que el usuario lo pida; realizar cambios y reservar la explicación para cuando la solicite.
 - Reglas conservadas: montos como cadenas decimales, fecha como fuente del mes, consultas filtradas por el usuario autenticado y validación en Form Requests Laravel.
 - [x] Se creó `finanzas.code-workspace` para abrir backend y frontend juntos en Visual Studio Code.
-- [x] El repositorio del frontend quedó reconocido por Git/VS Code como repositorio local independiente.
-- [ ] Conectar el repositorio a GitHub: falta definir o confirmar la URL del repositorio remoto antes de publicar.
+- [x] El frontend quedó integrado al repositorio principal y VS Code reconoce la rama `main`.
+- [x] Repositorio publicado en GitHub: `https://github.com/daniellopezpy/Programcion-con-IA`.
