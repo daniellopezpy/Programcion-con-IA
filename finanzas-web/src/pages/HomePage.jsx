@@ -54,9 +54,9 @@ export function HomePage() {
   ]
 
   return (
-    <div className="dashboard-stage -mx-4 -my-7 min-h-[calc(100vh-68px)] space-y-7 px-4 py-7 text-white sm:-mx-6 sm:px-6 lg:-mx-8 lg:-my-9 lg:px-8 lg:py-9">
+    <div className="dashboard-stage -mx-4 -my-7 space-y-7 px-4 py-7 pb-10 text-white sm:-mx-6 sm:px-6 lg:-mx-8 lg:-my-9 lg:px-8 lg:py-9">
       <DashboardHeader />
-      <FormMessage>{error}</FormMessage>
+      <FormMessage dark>{error}</FormMessage>
       {error && <Button variant="secondary" size="sm" className="w-fit" onClick={retryDashboard}><RefreshCw size={14} /> Reintentar</Button>}
       <DashboardBalancePanel summary={summary} loading={loading} query={query} />
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Métricas del período">
