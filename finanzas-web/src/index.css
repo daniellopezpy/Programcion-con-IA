@@ -10,6 +10,10 @@
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
   font-weight: 400;
+  --chart-1: #4f8a66;
+  --chart-2: #d4a55b;
+  --chart-3: #c45c53;
+  --chart-grid: #e7eee7;
 }
 
 * { box-sizing: border-box; }

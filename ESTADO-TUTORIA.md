@@ -75,3 +75,15 @@ El tutor implementa lo solicitado por el documento, explica cada bloque y valida
 - [x] Se creó `finanzas.code-workspace` para abrir backend y frontend juntos en Visual Studio Code.
 - [x] El frontend quedó integrado al repositorio principal y VS Code reconoce la rama `main`.
 - [x] Repositorio publicado en GitHub: `https://github.com/daniellopezpy/Programcion-con-IA`.
+
+## Semana 7 - dashboard y visualización
+
+- [x] P7.1: dashboard con cuatro tarjetas reutilizables, formato GTQ, estados de carga y enlaces a los listados.
+- [x] P7.2: selector único de mes/año compartido por dashboard, ingresos y egresos; el período queda en la URL.
+- [x] P7.3: gráfica horizontal de egresos por categoría con orden descendente, etiquetas GTQ, tooltip y estado vacío.
+- [x] P7.4: gráfica anual de doce meses con ingresos, egresos y balance; los valores negativos del balance se distinguen en rojo.
+- [x] P7.5: utilidades compartidas para moneda, fechas y nombres de meses usando `Intl`.
+- [x] P7.6: navegación desde las tarjetas conserva `anio` y `mes` en la URL.
+- [x] P7.7: refactorización del dashboard en `DashboardHeader`, `DashboardMetricCard`, `DashboardCharts`, contexto de período y componentes `ui` compartidos.
+- [x] Verificación frontend: `oxlint` limpio y `vite build` exitoso. Vite deja solo un aviso informativo por el tamaño del bundle.
+- [x] Verificación backend: 20 pruebas aprobadas y 92 aserciones con MySQL local activo.

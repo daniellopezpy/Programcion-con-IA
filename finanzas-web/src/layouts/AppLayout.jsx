@@ -3,6 +3,7 @@ import { ArrowDownLeft, ArrowUpRight, ChartNoAxesColumnIncreasing, CircleHelp, L
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/useAuth'
+import { DashboardPeriodProvider, useDashboardPeriod } from '@/context/dashboard-period'
 
 const navigation = [
   { to: '/', label: 'Resumen', icon: ChartNoAxesColumnIncreasing, end: true },
@@ -11,7 +12,12 @@ const navigation = [
 ]
 
 export function AppLayout() {
+  return <DashboardPeriodProvider><AppShell /></DashboardPeriodProvider>
+}
+
+function AppShell() {
   const { user, logout } = useAuth()
+  const { query } = useDashboardPeriod()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -38,7 +44,7 @@ export function AppLayout() {
         <Link to="/" className="mb-10 inline-flex items-center gap-2.5 px-2 text-lg font-bold tracking-tight"><span className="grid size-9 place-items-center rounded-xl bg-[#c5ed83] text-[#103d33]"><ChartNoAxesColumnIncreasing size={20} /></span>saldo<span className="-ml-2 text-[#79aa4c]">.</span></Link>
         <p className="px-3 text-[10px] font-bold uppercase tracking-[0.17em] text-[#9aa79f]">Tu espacio</p>
         <nav className="mt-3 grid gap-1" aria-label="Navegación principal">
-          {navigation.map(({ to, label, icon: Icon, end }) => <NavLink key={to} to={to} end={end} onClick={() => setMenuOpen(false)} className={({ isActive }) => `flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${isActive ? 'bg-[#e9f2e7] text-[#164c3c]' : 'text-[#687a70] hover:bg-[#f3f6f1] hover:text-[#24483b]'}`}><Icon size={18} strokeWidth={1.8} />{label}</NavLink>)}
+          {navigation.map(({ to, label, icon: Icon, end }) => <NavLink key={to} to={`${to}?${query}`} end={end} onClick={() => setMenuOpen(false)} className={({ isActive }) => `flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${isActive ? 'bg-[#e9f2e7] text-[#164c3c]' : 'text-[#687a70] hover:bg-[#f3f6f1] hover:text-[#24483b]'}`}><Icon size={18} strokeWidth={1.8} />{label}</NavLink>)}
         </nav>
         <div className="mt-auto rounded-2xl border border-[#e4ebe3] bg-[#f7f9f5] p-4">
           <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-[#d9e9d2] text-sm font-bold text-[#285541]">{initials}</div>
