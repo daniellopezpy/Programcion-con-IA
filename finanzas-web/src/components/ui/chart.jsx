@@ -23,16 +23,16 @@ export function ChartTooltipContent({ active, payload, label, formatter }) {
   if (!active || !payload?.length) return null
 
   return (
-    <div className="rounded-xl border border-[#dfe8df] bg-white px-3 py-2.5 shadow-lg shadow-[#193b2c]/10">
-      {label && <p className="mb-1.5 text-[11px] font-semibold text-[#61756a]">{label}</p>}
+    <div className="rounded-xl border border-white/10 bg-[#18181e] px-3 py-2.5 shadow-xl shadow-black/30">
+      {label && <p className="mb-1.5 text-[11px] font-semibold text-[#aaa8b5]">{label}</p>}
       <div className="grid gap-1.5">
         {payload.map((entry) => {
           const item = config[entry.dataKey] || {}
           const rendered = formatter ? formatter(entry.value, entry.dataKey) : entry.value
           return (
             <div key={entry.dataKey} className="flex items-center justify-between gap-5 text-xs">
-              <span className="flex items-center gap-1.5 text-[#748178]"><span className="size-2 rounded-full" style={{ backgroundColor: `var(--color-${entry.dataKey})` }} />{item.label || entry.name}</span>
-              <strong className="font-semibold text-[#294237]">{rendered}</strong>
+              <span className="flex items-center gap-1.5 text-[#aaa8b5]"><span className="size-2 rounded-full" style={{ backgroundColor: `var(--color-${entry.dataKey})` }} />{item.label || entry.name}</span>
+              <strong className="font-semibold text-white">{rendered}</strong>
             </div>
           )
         })}
