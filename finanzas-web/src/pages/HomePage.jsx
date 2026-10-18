@@ -54,9 +54,9 @@ export function HomePage() {
   ]
 
   return (
-    <div className="dashboard-stage -mx-4 -my-7 space-y-7 px-4 py-7 pb-10 text-white sm:-mx-6 sm:px-6 lg:-mx-8 lg:-my-9 lg:px-8 lg:py-9">
+    <div className="thought-page grid gap-12 pb-10">
       <DashboardHeader />
-      <FormMessage dark>{error}</FormMessage>
+      <FormMessage>{error}</FormMessage>
       {error && <Button variant="secondary" size="sm" className="w-fit" onClick={retryDashboard}><RefreshCw size={14} /> Reintentar</Button>}
       <DashboardBalancePanel summary={summary} loading={loading} query={query} />
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Métricas del período">
@@ -66,8 +66,8 @@ export function HomePage() {
         <CategoryExpensesChart data={categories} loading={loading} />
         <AnnualEvolutionChart data={annual} loading={loading} />
       </section>
-      <section className="flex flex-col justify-between gap-5 rounded-xl border border-white/10 bg-[#111116] p-5 shadow-lg shadow-black/20 sm:flex-row sm:items-center sm:p-6"><div><p className="text-sm font-semibold text-white">¿Quieres mantener tus números al día?</p><p className="mt-1 text-sm text-[#858290]">Registra un movimiento y el resumen se actualizará automáticamente.</p></div><div className="flex flex-wrap gap-2"><Link to={`/ingresos?${query}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 px-3.5 py-2 text-sm font-semibold text-[#c5ed83] transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ae7bff]"><ArrowDownLeft size={16} /> Ver ingresos</Link><Link to={`/egresos/nuevo?${query}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#ae7bff] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#bd91ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ae7bff]">Registrar egreso <ArrowRight size={16} /></Link></div></section>
-      <p className="flex items-center gap-2 text-xs text-[#8a968f]"><CircleHelp size={14} /> Los totales se consultan desde tu cuenta y el período seleccionado.</p>
+      <section className="flex flex-col justify-between gap-6 border border-[#e7e5e4] bg-[#f5f5f4] p-6 sm:flex-row sm:items-center"><div><p className="text-sm font-semibold text-[#1c1917]">¿Quieres mantener tus números al día?</p><p className="mt-1 text-sm text-[#57534e]">Registra un movimiento y el resumen se actualizará automáticamente.</p></div><div className="flex flex-wrap gap-3"><Link to={`/ingresos?${query}`} className="thought-focus inline-flex min-h-10 items-center gap-2 border border-[#d6d3d1] bg-[#fafaf9] px-4 py-2 text-sm font-semibold text-[#57534e] transition-colors hover:bg-[#efedeb]"><ArrowDownLeft size={16} /> Ver ingresos</Link><Link to={`/egresos/nuevo?${query}`} className="thought-focus inline-flex min-h-10 items-center gap-2 border border-[#78716c] bg-[#78716c] px-4 py-2 text-sm font-semibold text-[#fafaf9] transition-colors hover:bg-[#57534e]">Registrar egreso <ArrowRight size={16} /></Link></div></section>
+      <p className="flex items-center gap-2 text-xs text-[#78716c]"><CircleHelp size={14} /> Los totales se consultan desde tu cuenta y el período seleccionado.</p>
     </div>
   )
 }

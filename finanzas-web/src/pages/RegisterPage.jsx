@@ -39,21 +39,21 @@ export function RegisterPage() {
 
   return (
     <section className="w-full max-w-md">
-      <div className="mb-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c5ed83]">Empieza por aquí</p>
-        <h1 className="mt-3 font-serif text-4xl tracking-[-0.04em] text-white sm:text-5xl">Crea tu cuenta</h1>
-        <p className="mt-3 text-sm leading-6 text-[#aaa8b5]">Un buen mapa de tus finanzas empieza con tus datos.</p>
+      <div className="mb-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#78716c]">Empieza por aquí</p>
+        <h1 className="thought-serif mt-4 text-3xl font-bold tracking-[-0.03em] text-[#1c1917] sm:text-4xl">Crea tu cuenta</h1>
+        <p className="mt-4 text-[17px] leading-[1.8] text-[#57534e]">Un buen mapa de tus finanzas empieza con tus datos.</p>
       </div>
       <form className="grid gap-4" onSubmit={handleSubmit}>
-        <FormMessage dark>{message}</FormMessage>
-        <FormField dark id="name" name="name" label="Nombre" autoComplete="name" placeholder="¿Cómo te llamas?" value={values.name} onChange={updateField} error={errors.name} required />
-        <FormField dark id="email" name="email" label="Correo electrónico" type="email" autoComplete="email" placeholder="nombre@correo.com" value={values.email} onChange={updateField} error={errors.email} required />
-        <FormField dark id="password" name="password" label="Contraseña" type="password" autoComplete="new-password" placeholder="Al menos 8 caracteres" value={values.password} onChange={updateField} error={errors.password} required />
-        <FormField dark id="password_confirmation" name="password_confirmation" label="Confirma tu contraseña" type="password" autoComplete="new-password" placeholder="Escríbela otra vez" value={values.password_confirmation} onChange={updateField} error={errors.password_confirmation} required />
-        <Button className="mt-1 w-full bg-[#ae7bff] text-white hover:bg-[#bd91ff]" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creando cuenta…' : 'Crear mi cuenta'}{!isSubmitting && <ArrowRight size={17} />}</Button>
+        <FormMessage>{message}</FormMessage>
+        <FormField id="name" name="name" label="Nombre" autoComplete="name" placeholder="¿Cómo te llamas?" value={values.name} onChange={updateField} error={errors.name} required />
+        <FormField id="email" name="email" label="Correo electrónico" type="email" autoComplete="email" placeholder="nombre@correo.com" value={values.email} onChange={updateField} error={errors.email} required />
+        <FormField id="password" name="password" label="Contraseña" type="password" autoComplete="new-password" placeholder="Al menos 8 caracteres" value={values.password} onChange={updateField} error={errors.password} required />
+        <FormField id="password_confirmation" name="password_confirmation" label="Confirma tu contraseña" type="password" autoComplete="new-password" placeholder="Escríbela otra vez" value={values.password_confirmation} onChange={updateField} error={errors.password_confirmation} required />
+        <Button className="thought-focus mt-2 w-full" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creando cuenta…' : 'Crear mi cuenta'}{!isSubmitting && <ArrowRight size={17} />}</Button>
       </form>
-      <p className="mt-6 text-center text-sm text-[#aaa8b5]">¿Ya tienes una cuenta? <Link className="font-semibold text-[#c5ed83] underline decoration-[#c5ed83]/50 underline-offset-4" to="/login">Inicia sesión</Link></p>
-      <p className="mt-4 text-center text-[11px] text-[#858290]">Tus datos se usan solo para tu espacio financiero.</p>
+      <p className="mt-6 text-center text-[15px] text-[#57534e]">¿Ya tienes una cuenta? <Link className="font-semibold text-[#78716c] underline underline-offset-4" to="/login">Inicia sesión</Link></p>
+      <p className="mt-4 text-center text-[13px] text-[#a8a29e]">Tus datos se usan solo para tu espacio financiero.</p>
     </section>
   )
 }
