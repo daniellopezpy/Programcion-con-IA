@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, ChartNoAxesColumnIncreasing, CircleHelp, LogOut, Menu, Plus, Wallet, X } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, ChartNoAxesColumnIncreasing, CircleHelp, LogOut, Menu, Wallet, X } from 'lucide-react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/useAuth'
@@ -57,7 +57,6 @@ function AppShell() {
         </header>
         <main className="mx-auto w-full max-w-[1240px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14"><Outlet /></main>
       </div>
-      <NavLink to={`/egresos/nuevo?${query}`} className="thought-focus fixed bottom-5 right-5 z-20 inline-flex items-center gap-2 border border-[#78716c] bg-[#78716c] px-4 py-3 text-[15px] font-semibold text-[#fafaf9] hover:bg-[#57534e] lg:hidden"><Plus size={18} /> Nuevo egreso</NavLink>
     </div>
   )
 }
