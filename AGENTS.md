@@ -1,5 +1,7 @@
 # Flujo de trabajo de Saldo Finanzas
 
+La especificación arquitectónica y el plan de fases están en `docs/ARQUITECTURA-ANTIGRAVITY.md`. Leer ambos archivos antes de implementar.
+
 ## Roles
 
 - Codex actúa como arquitecto: define la solución, divide el trabajo, revisa los cambios y decide si una entrega está lista.
