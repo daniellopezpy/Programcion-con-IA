@@ -3,28 +3,34 @@ import { ArrowDownWideNarrow, ArrowRight, CalendarDays, Plus, RefreshCw, Trash2 
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { FormMessage } from '@/components/FormField'
+import { PaginationControls } from '@/components/PaginationControls'
 import { useDashboardPeriod } from '@/context/dashboard-period'
 import { api } from '@/lib/api'
 import { formatCurrency, formatearFecha, monthName } from '@/lib/utils'
 
 export function ExpensesPage() {
+  const PAGE_SIZE = 20
   const navigate = useNavigate()
   const { period, setPeriod } = useDashboardPeriod()
   const [expenses, setExpenses] = useState([])
+  const [pagination, setPagination] = useState(null)
+  const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
 
   const loadExpenses = useCallback(async () => {
     try {
-      const params = new URLSearchParams(period)
-      setExpenses(await api.get(`/egresos?${params}`))
+      const params = new URLSearchParams({ ...period, page, per_page: PAGE_SIZE })
+      const payload = await api.get(`/egresos?${params}`)
+      setExpenses(Array.isArray(payload) ? payload : payload.data || [])
+      setPagination(payload?.meta || null)
     } catch (requestError) {
       setError(requestError.message)
     } finally {
       setLoading(false)
     }
-  }, [period])
+  }, [page, period])
 
   // oxlint-disable-next-line react/set-state-in-effect -- The state changes only after the API request resolves.
   useEffect(() => { loadExpenses() }, [loadExpenses])
@@ -53,6 +59,7 @@ export function ExpensesPage() {
   function updatePeriod(name, value) {
     setLoading(true)
     setError('')
+    setPage(1)
     setPeriod({ [name]: value })
   }
 
@@ -69,8 +76,9 @@ export function ExpensesPage() {
       <FormMessage tone={notice ? 'success' : 'error'}>{notice || error}</FormMessage>
       {error && <Button variant="secondary" size="sm" className="w-fit" onClick={retryLoading}><RefreshCw size={14} /> Reintentar</Button>}
       <section className="overflow-hidden border border-[#e7e5e4] bg-[#fafaf9]">
-        <div className="flex items-center justify-between border-b border-[#e7e5e4] px-6 py-5"><div><h2 className="text-sm font-semibold text-[#1c1917]">Movimientos del período</h2><p className="mt-1 text-xs text-[#78716c]">{loading ? 'Cargando…' : `${expenses.length} ${expenses.length === 1 ? 'egreso' : 'egresos'}`}</p></div><span className="grid size-9 place-items-center bg-[#fefce8] text-[#a16207]"><ArrowDownWideNarrow size={17} /></span></div>
+        <div className="flex items-center justify-between border-b border-[#e7e5e4] px-6 py-5"><div><h2 className="text-sm font-semibold text-[#1c1917]">Movimientos del período</h2><p className="mt-1 text-xs text-[#78716c]">{loading ? 'Cargando…' : `${pagination?.total ?? expenses.length} ${(pagination?.total ?? expenses.length) === 1 ? 'egreso' : 'egresos'}`}</p></div><span className="grid size-9 place-items-center bg-[#fefce8] text-[#a16207]"><ArrowDownWideNarrow size={17} /></span></div>
         {loading ? <div className="grid gap-3 p-6">{[1, 2, 3].map((item) => <div key={item} className="h-12 animate-pulse bg-[#efedeb]" />)}</div> : error ? null : expenses.length === 0 ? <div className="grid justify-items-center px-6 py-16 text-center"><span className="grid size-12 place-items-center bg-[#fefce8] text-[#a16207]"><CalendarDays size={21} /></span><h3 className="mt-5 text-base font-semibold text-[#1c1917]">Todavía no hay egresos</h3><p className="mt-2 max-w-sm text-sm leading-6 text-[#78716c]">No encontramos movimientos en este mes. Cuando registres uno, aparecerá aquí.</p><Button className="mt-6" size="sm" onClick={() => navigate(`/egresos/nuevo?anio=${period.anio}&mes=${period.mes}`)}><Plus size={15} /> Registrar primer egreso</Button></div> : <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-[#f5f5f4] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#78716c]"><tr><th className="px-6 py-3">Fecha</th><th className="px-6 py-3">Descripción</th><th className="px-6 py-3">Categoría</th><th className="px-6 py-3">Subcategoría</th><th className="px-6 py-3 text-right">Monto</th><th className="px-6 py-3 text-right">Acciones</th></tr></thead><tbody className="divide-y divide-[#e7e5e4]">{expenses.map((expense) => <tr key={expense.id} className="transition-colors hover:bg-[#f5f5f4]"><td className="whitespace-nowrap px-6 py-4 text-[#78716c]">{formatearFecha(expense.fecha)}</td><td className="max-w-[220px] truncate px-6 py-4 font-medium text-[#1c1917]" title={expense.descripcion}>{expense.descripcion}</td><td className="px-6 py-4 text-[#57534e]">{expense.categoria?.nombre || '—'}</td><td className="px-6 py-4 text-[#78716c]">{expense.subcategoria?.nombre || '—'}</td><td className="whitespace-nowrap px-6 py-4 text-right font-semibold text-[#57534e]">{formatCurrency(expense.monto)}</td><td className="px-6 py-3"><div className="flex justify-end gap-1"><Link className="thought-focus inline-flex size-9 items-center justify-center text-[#78716c] hover:bg-[#efedeb] hover:text-[#1c1917]" to={`/egresos/${expense.id}/editar?anio=${period.anio}&mes=${period.mes}`} aria-label={`Editar ${expense.descripcion}`}><ArrowRight size={16} /></Link><Button variant="ghost" size="icon" className="size-9 text-[#dc2626] hover:bg-[#fef2f2] hover:text-[#b91c1c]" aria-label={`Eliminar ${expense.descripcion}`} onClick={() => deleteExpense(expense)}><Trash2 size={16} /></Button></div></td></tr>)}</tbody></table></div>}
+        {!loading && !error && expenses.length > 0 && <PaginationControls label="egresos" pagination={pagination} onPageChange={(nextPage) => { setLoading(true); setPage(nextPage) }} />}
       </section>
     </div>
   )

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Database\Factories\IngresoFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,8 +37,19 @@ class Ingreso extends Model
 
     public function scopeDelMes(Builder $query, int $anio, int $mes): Builder
     {
-        return $query
-            ->whereYear('fecha', $anio)
-            ->whereMonth('fecha', $mes);
+        $inicio = CarbonImmutable::create($anio, $mes, 1);
+
+        return $this->scopeEntreFechas($query, $inicio, $inicio->endOfMonth());
+    }
+
+    public function scopeEntreFechas(
+        Builder $query,
+        CarbonInterface|string $desde,
+        CarbonInterface|string $hasta,
+    ): Builder {
+        return $query->whereBetween('fecha', [
+            $desde instanceof CarbonInterface ? $desde->toDateString() : $desde,
+            $hasta instanceof CarbonInterface ? $hasta->toDateString() : $hasta,
+        ]);
     }
 }

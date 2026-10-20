@@ -35,8 +35,8 @@ class IngresoApiTest extends TestCase
 
         $this->getJson('/api/ingresos?anio=2026&mes=5')
             ->assertOk()
-            ->assertJsonCount(1)
-            ->assertJsonPath('0.fuente', 'Trabajo de Ana');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.fuente', 'Trabajo de Ana');
         $this->getJson("/api/ingresos/{$ingresoLuis->id}")->assertNotFound();
         $this->deleteJson('/api/ingresos/'.$creado->json('id'))->assertNoContent();
     }
@@ -53,5 +53,49 @@ class IngresoApiTest extends TestCase
             'fuente' => 'Trabajo',
             'monto' => '2500.00',
         ])->assertUnprocessable()->assertJsonValidationErrors('categoria_id');
+    }
+
+    public function test_index_pagina_y_filtra_por_rango_sin_mezclar_usuarios(): void
+    {
+        $ana = User::factory()->create();
+        $luis = User::factory()->create();
+        $categoria = Categoria::create(['nombre' => 'Empleo', 'tipo' => 'ingreso']);
+
+        foreach (['2026-05-01', '2026-05-02', '2026-05-03'] as $fecha) {
+            $ana->ingresos()->create([
+                'categoria_id' => $categoria->id,
+                'fecha' => $fecha,
+                'fuente' => 'Trabajo de Ana',
+                'monto' => '100.00',
+            ]);
+        }
+        $luis->ingresos()->create([
+            'categoria_id' => $categoria->id,
+            'fecha' => '2026-05-02',
+            'fuente' => 'Trabajo de Luis',
+            'monto' => '999.00',
+        ]);
+
+        Sanctum::actingAs($ana);
+
+        $this->getJson('/api/ingresos?desde=2026-05-01&hasta=2026-05-03&per_page=1&page=2')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.fecha', '2026-05-02T00:00:00.000000Z')
+            ->assertJsonPath('meta.current_page', 2)
+            ->assertJsonPath('meta.last_page', 3)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function test_index_rechaza_rango_incompleto_o_invertido(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $this->getJson('/api/ingresos?desde=2026-05-03')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('hasta');
+        $this->getJson('/api/ingresos?desde=2026-05-04&hasta=2026-05-03')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('hasta');
     }
 }

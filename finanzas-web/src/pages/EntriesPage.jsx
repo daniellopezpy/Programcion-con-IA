@@ -2,26 +2,32 @@ import { useCallback, useEffect, useState } from 'react'
 import { ArrowDownLeft, CalendarDays, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FormMessage } from '@/components/FormField'
+import { PaginationControls } from '@/components/PaginationControls'
 import { useDashboardPeriod } from '@/context/dashboard-period'
 import { api } from '@/lib/api'
 import { formatCurrency, formatearFecha, monthName } from '@/lib/utils'
 
 export function EntriesPage() {
+  const PAGE_SIZE = 20
   const { period, setPeriod } = useDashboardPeriod()
   const [entries, setEntries] = useState([])
+  const [pagination, setPagination] = useState(null)
+  const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const loadEntries = useCallback(async () => {
     try {
-      const params = new URLSearchParams(period)
-      setEntries(await api.get(`/ingresos?${params}`))
+      const params = new URLSearchParams({ ...period, page, per_page: PAGE_SIZE })
+      const payload = await api.get(`/ingresos?${params}`)
+      setEntries(Array.isArray(payload) ? payload : payload.data || [])
+      setPagination(payload?.meta || null)
     } catch (requestError) {
       setError(requestError.message)
     } finally {
       setLoading(false)
     }
-  }, [period])
+  }, [page, period])
 
   // oxlint-disable-next-line react/set-state-in-effect -- The state changes only after the API request resolves.
   useEffect(() => { loadEntries() }, [loadEntries])
@@ -35,6 +41,7 @@ export function EntriesPage() {
   function updatePeriod(name, value) {
     setLoading(true)
     setError('')
+    setPage(1)
     setPeriod({ [name]: value })
   }
 
@@ -55,8 +62,9 @@ export function EntriesPage() {
       <FormMessage>{error}</FormMessage>
       {error && <Button variant="secondary" size="sm" className="w-fit" onClick={retryLoading}><RefreshCw size={14} /> Reintentar</Button>}
       <section className="overflow-hidden border border-[#e7e5e4] bg-[#fafaf9]">
-        <div className="border-b border-[#e7e5e4] px-6 py-5"><h2 className="text-sm font-semibold text-[#1c1917]">Ingresos del período</h2><p className="mt-1 text-xs text-[#78716c]">{loading ? 'Cargando…' : `${entries.length} ${entries.length === 1 ? 'ingreso' : 'ingresos'}`}</p></div>
-        {loading ? <div className="grid gap-3 p-6">{[1, 2, 3].map((item) => <div key={item} className="h-12 animate-pulse bg-[#efedeb]" />)}</div> : error ? null : entries.length === 0 ? <div className="grid justify-items-center px-6 py-16 text-center"><span className="grid size-12 place-items-center bg-[#f0fdf4] text-[#15803d]"><ArrowDownLeft size={21} /></span><h3 className="mt-5 text-base font-semibold text-[#1c1917]">Todavía no hay ingresos</h3><p className="mt-2 max-w-sm text-sm leading-6 text-[#78716c]">Cuando registres ingresos desde tu sistema, aparecerán aquí.</p></div> : <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-[#f5f5f4] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#78716c]"><tr><th className="px-6 py-3">Fecha</th><th className="px-6 py-3">Descripción</th><th className="px-6 py-3">Categoría</th><th className="px-6 py-3 text-right">Monto</th></tr></thead><tbody className="divide-y divide-[#e7e5e4]">{entries.map((entry) => <tr key={entry.id} className="transition-colors hover:bg-[#f5f5f4]"><td className="whitespace-nowrap px-6 py-4 text-[#78716c]">{formatearFecha(entry.fecha)}</td><td className="px-6 py-4 font-medium text-[#1c1917]">{entry.descripcion}</td><td className="px-6 py-4 text-[#57534e]">{entry.categoria?.nombre || '—'}</td><td className="whitespace-nowrap px-6 py-4 text-right font-semibold text-[#57534e]">{formatCurrency(entry.monto)}</td></tr>)}</tbody></table></div>}
+        <div className="border-b border-[#e7e5e4] px-6 py-5"><h2 className="text-sm font-semibold text-[#1c1917]">Ingresos del período</h2><p className="mt-1 text-xs text-[#78716c]">{loading ? 'Cargando…' : `${pagination?.total ?? entries.length} ${(pagination?.total ?? entries.length) === 1 ? 'ingreso' : 'ingresos'}`}</p></div>
+        {loading ? <div className="grid gap-3 p-6">{[1, 2, 3].map((item) => <div key={item} className="h-12 animate-pulse bg-[#efedeb]" />)}</div> : error ? null : entries.length === 0 ? <div className="grid justify-items-center px-6 py-16 text-center"><span className="grid size-12 place-items-center bg-[#f0fdf4] text-[#15803d]"><ArrowDownLeft size={21} /></span><h3 className="mt-5 text-base font-semibold text-[#1c1917]">Todavía no hay ingresos</h3><p className="mt-2 max-w-sm text-sm leading-6 text-[#78716c]">Cuando registres ingresos desde tu sistema, aparecerán aquí.</p></div> : <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-[#f5f5f4] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#78716c]"><tr><th className="px-6 py-3">Fecha</th><th className="px-6 py-3">Descripción</th><th className="px-6 py-3">Categoría</th><th className="px-6 py-3 text-right">Monto</th></tr></thead><tbody className="divide-y divide-[#e7e5e4]">{entries.map((entry) => <tr key={entry.id} className="transition-colors hover:bg-[#f5f5f4]"><td className="whitespace-nowrap px-6 py-4 text-[#78716c]">{formatearFecha(entry.fecha)}</td><td className="px-6 py-4 font-medium text-[#1c1917]">{entry.fuente}</td><td className="px-6 py-4 text-[#57534e]">{entry.categoria?.nombre || '—'}</td><td className="whitespace-nowrap px-6 py-4 text-right font-semibold text-[#57534e]">{formatCurrency(entry.monto)}</td></tr>)}</tbody></table></div>}
+        {!loading && !error && entries.length > 0 && <PaginationControls label="ingresos" pagination={pagination} onPageChange={(nextPage) => { setLoading(true); setPage(nextPage) }} />}
       </section>
     </div>
   )

@@ -40,10 +40,10 @@ class EgresoApiTest extends TestCase
 
         $this->getJson('/api/egresos?anio=2026&mes=5')
             ->assertOk()
-            ->assertJsonCount(1)
-            ->assertJsonPath('0.id', $mayoAna->id)
-            ->assertJsonPath('0.categoria.nombre', 'Vivienda')
-            ->assertJsonPath('0.subcategoria.nombre', 'Internet');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $mayoAna->id)
+            ->assertJsonPath('data.0.categoria.nombre', 'Vivienda')
+            ->assertJsonPath('data.0.subcategoria.nombre', 'Internet');
     }
 
     public function test_otro_usuario_recibe_404_al_consultar_modificar_o_borrar_un_egreso(): void
@@ -95,6 +95,30 @@ class EgresoApiTest extends TestCase
             'fecha',
             'monto',
         ]);
+    }
+
+    public function test_index_pagina_y_filtra_por_rango(): void
+    {
+        [$ana, , $categoria] = $this->crearContexto();
+
+        foreach (['2026-05-01', '2026-05-02', '2026-05-03'] as $fecha) {
+            $ana->egresos()->create([
+                'categoria_id' => $categoria->id,
+                'fecha' => $fecha,
+                'descripcion' => 'Gasto de Ana',
+                'monto' => '100.00',
+            ]);
+        }
+
+        Sanctum::actingAs($ana);
+
+        $this->getJson('/api/egresos?desde=2026-05-01&hasta=2026-05-03&per_page=2&page=2')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.fecha', '2026-05-01T00:00:00.000000Z')
+            ->assertJsonPath('meta.current_page', 2)
+            ->assertJsonPath('meta.last_page', 2)
+            ->assertJsonPath('meta.total', 3);
     }
 
     /** @return array{User, User, Categoria, Subcategoria} */
