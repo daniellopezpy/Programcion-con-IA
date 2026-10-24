@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowDownLeft, ArrowUpRight, ChartNoAxesColumnIncreasing, CircleHelp, LogOut, Menu, Plus, Wallet, X } from 'lucide-react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/useAuth'
 import { DashboardPeriodProvider, useDashboardPeriod } from '@/context/dashboard-period'
@@ -18,8 +18,10 @@ export function AppLayout() {
 function AppShell() {
   const { user, logout } = useAuth()
   const { query } = useDashboardPeriod()
+  const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const isExpenseForm = location.pathname === '/egresos/nuevo' || /^\/egresos\/\d+\/editar$/.test(location.pathname)
 
   async function handleLogout() {
     try {
@@ -33,7 +35,7 @@ function AppShell() {
   const initials = (user?.name || 'U').split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#08080b] text-white">
+    <div className="min-h-screen overflow-x-clip bg-[#08080b] text-white">
       <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-white/10 bg-[#0d0d11]/95 px-4 backdrop-blur sm:px-6 lg:hidden">
         <Link to="/" className="inline-flex items-center gap-2 text-lg font-bold tracking-tight"><span className="grid size-8 place-items-center rounded-lg bg-[#c5ed83] text-[#103d33]"><ChartNoAxesColumnIncreasing size={18} /></span>saldo<span className="text-[#c5ed83]">.</span></Link>
         <button className="grid size-10 place-items-center rounded-xl text-[#aaa8b5] hover:bg-white/5" type="button" aria-label={menuOpen ? 'Cerrar navegación' : 'Abrir navegación'} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button>
@@ -59,9 +61,9 @@ function AppShell() {
           <div className="inline-flex items-center gap-2 text-xs text-[#858290]"><Wallet size={15} /> Finanzas personales</div>
           <div className="flex items-center gap-4"><button type="button" className="grid size-9 place-items-center rounded-full text-[#858290] hover:bg-white/5" aria-label="Ayuda"><CircleHelp size={18} /></button><div className="h-5 w-px bg-white/10" /><span className="text-sm font-medium text-[#d6d3df]">{user?.name}</span><span className="grid size-8 place-items-center rounded-full bg-[#c5ed83]/15 text-xs font-bold text-[#c5ed83]">{initials}</span></div>
         </header>
-        <main className="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9"><Outlet /></main>
+        <main className="mx-auto w-full max-w-[1320px] px-4 pt-7 pb-28 sm:px-6 lg:px-8 lg:py-9"><Outlet /></main>
       </div>
-      <NavLink to="/egresos/nuevo" className="fixed bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-[#ae7bff] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 hover:bg-[#bd91ff] lg:hidden"><Plus size={18} /> Nuevo egreso</NavLink>
+      {!isExpenseForm && <NavLink to="/egresos/nuevo" className="fixed bottom-5 right-5 z-20 inline-flex items-center gap-2 rounded-full bg-[#ae7bff] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 hover:bg-[#bd91ff] lg:hidden"><Plus size={18} /> Nuevo egreso</NavLink>}
     </div>
   )
 }
