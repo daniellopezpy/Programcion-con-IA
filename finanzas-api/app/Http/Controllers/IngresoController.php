@@ -2,42 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Concerns\RespondsWithPagination;
 use App\Http\Requests\IndexIngresoRequest;
 use App\Http\Requests\IngresoRequest;
-use App\Support\DashboardCache;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class IngresoController extends Controller
 {
-    use RespondsWithPagination;
-
-    public function __construct(private readonly DashboardCache $dashboardCache) {}
-
     /**
      * Display a listing of the resource.
      */
     public function index(IndexIngresoRequest $request): JsonResponse
     {
-        [$desde, $hasta] = $this->rango($request);
-
-        $query = $request->user()
+        $ingresos = $request->user()
             ->ingresos()
-            ->with('categoria');
-
-        if ($desde !== null) {
-            $query->entreFechas($desde, $hasta);
-        }
-
-        $ingresos = $query
+            ->with('categoria')
+            ->when(
+                $request->filled(['anio', 'mes']),
+                fn ($query) => $query->delMes(
+                    $request->integer('anio'),
+                    $request->integer('mes'),
+                ),
+            )
             ->orderByDesc('fecha')
-            ->orderByDesc('id')
-            ->paginate($request->integer('per_page', 20))
-            ->withQueryString();
+            ->get();
 
-        return $this->paginatedJson($ingresos);
+        return response()->json($ingresos);
     }
 
     /**
@@ -46,7 +36,6 @@ class IngresoController extends Controller
     public function store(IngresoRequest $request): JsonResponse
     {
         $ingreso = $request->user()->ingresos()->create($request->validated());
-        $this->dashboardCache->invalidate($request->user()->getKey());
 
         return response()->json($ingreso->load('categoria'), 201);
     }
@@ -71,7 +60,6 @@ class IngresoController extends Controller
     {
         $ingresoEncontrado = $request->user()->ingresos()->findOrFail($ingreso);
         $ingresoEncontrado->update($request->validated());
-        $this->dashboardCache->invalidate($request->user()->getKey());
 
         return response()->json($ingresoEncontrado->load('categoria'));
     }
@@ -82,27 +70,7 @@ class IngresoController extends Controller
     public function destroy(IndexIngresoRequest $request, int $ingreso): Response
     {
         $request->user()->ingresos()->findOrFail($ingreso)->delete();
-        $this->dashboardCache->invalidate($request->user()->getKey());
 
         return response()->noContent();
-    }
-
-    /** @return array{string|null, string|null} */
-    private function rango(IndexIngresoRequest $request): array
-    {
-        if ($request->filled('desde')) {
-            return [
-                (string) $request->string('desde'),
-                (string) $request->string('hasta'),
-            ];
-        }
-
-        if (! $request->filled('anio')) {
-            return [null, null];
-        }
-
-        $inicio = CarbonImmutable::create($request->integer('anio'), $request->integer('mes'), 1);
-
-        return [$inicio->toDateString(), $inicio->endOfMonth()->toDateString()];
     }
 }

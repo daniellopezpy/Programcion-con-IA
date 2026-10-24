@@ -17,6 +17,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/resumen', [DashboardController::class, 'resumen']);
         Route::get('/egresos-por-categoria', [DashboardController::class, 'egresosPorCategoria']);
         Route::get('/resumen-anual', [DashboardController::class, 'resumenAnual']);
+        Route::get('/meta-ahorro', [DashboardController::class, 'metaAhorro']);
+        Route::put('/meta-ahorro', [DashboardController::class, 'guardarMetaAhorro']);
+        Route::delete('/meta-ahorro', [DashboardController::class, 'eliminarMetaAhorro']);
     });
     Route::apiResource('egresos', EgresoController::class);
     Route::apiResource('ingresos', IngresoController::class);

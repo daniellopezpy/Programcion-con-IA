@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { DashboardBalancePanel } from '@/components/DashboardBalancePanel'
 import { DashboardMetricCard } from '@/components/DashboardMetricCard'
+import { DashboardSavingsGoal } from '@/components/DashboardSavingsGoal'
 import { CategoryExpensesChart, AnnualEvolutionChart } from '@/components/DashboardCharts'
 import { Button } from '@/components/ui/button'
 import { FormMessage } from '@/components/FormField'
@@ -15,6 +16,11 @@ export function HomePage() {
   const [summary, setSummary] = useState(null)
   const [categories, setCategories] = useState([])
   const [annual, setAnnual] = useState([])
+  const [savingsGoal, setSavingsGoal] = useState(null)
+  const [savingsGoalLoading, setSavingsGoalLoading] = useState(true)
+  const [savingsGoalError, setSavingsGoalError] = useState('')
+  const [savingsGoalSaving, setSavingsGoalSaving] = useState(false)
+  const [savingsGoalNotice, setSavingsGoalNotice] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -40,8 +46,64 @@ export function HomePage() {
   // oxlint-disable-next-line react/set-state-in-effect -- The state changes only after the API request resolves.
   useEffect(() => { loadDashboard() }, [loadDashboard])
 
+  const loadSavingsGoal = useCallback(async () => {
+    setSavingsGoalLoading(true)
+    setSavingsGoalError('')
+    setSavingsGoalNotice('')
+    try {
+      const data = await api.get(`/dashboard/meta-ahorro?${query}`)
+      setSavingsGoal(data)
+    } catch (requestError) {
+      setSavingsGoalError(requestError.message)
+    } finally {
+      setSavingsGoalLoading(false)
+    }
+  }, [query])
+
+  // oxlint-disable-next-line react/set-state-in-effect -- The state changes only after the API request resolves.
+  useEffect(() => { loadSavingsGoal() }, [loadSavingsGoal])
+
   async function retryDashboard() {
     await loadDashboard()
+  }
+
+  async function saveSavingsGoal(amount) {
+    setSavingsGoalSaving(true)
+    setSavingsGoalNotice('')
+    setSavingsGoalError('')
+    try {
+      const data = await api.put('/dashboard/meta-ahorro', {
+        anio: Number(period.anio),
+        mes: Number(period.mes),
+        monto_objetivo: amount,
+      })
+      setSavingsGoal(data)
+      setSavingsGoalNotice('Meta guardada para este período.')
+    } catch (requestError) {
+      setSavingsGoalError(requestError.message)
+    } finally {
+      setSavingsGoalSaving(false)
+    }
+  }
+
+  async function deleteSavingsGoal() {
+    setSavingsGoalSaving(true)
+    setSavingsGoalNotice('')
+    setSavingsGoalError('')
+    try {
+      await api.delete(`/dashboard/meta-ahorro?${query}`)
+      setSavingsGoal((current) => ({
+        ...(current || { ingresos_acumulados: '0.00' }),
+        meta: null,
+        porcentaje_progreso: '0.00',
+        faltante: '0.00',
+      }))
+      setSavingsGoalNotice('Meta eliminada para este período.')
+    } catch (requestError) {
+      setSavingsGoalError(requestError.message)
+    } finally {
+      setSavingsGoalSaving(false)
+    }
   }
 
   const balanceIsNegative = Number(summary?.balance_mes || 0) < 0
@@ -54,7 +116,7 @@ export function HomePage() {
   ]
 
   return (
-    <div className="thought-page grid gap-12 pb-10">
+    <div className="dashboard-stage -mx-4 -my-7 min-h-[calc(100vh-68px)] space-y-7 px-4 py-7 text-white sm:-mx-6 sm:px-6 lg:-mx-8 lg:-my-9 lg:px-8 lg:py-9">
       <DashboardHeader />
       <FormMessage>{error}</FormMessage>
       {error && <Button variant="secondary" size="sm" className="w-fit" onClick={retryDashboard}><RefreshCw size={14} /> Reintentar</Button>}
@@ -62,12 +124,13 @@ export function HomePage() {
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Métricas del período">
         {metrics.map((metric) => <DashboardMetricCard key={metric.label} {...metric} loading={loading} to={metric.to ? `${metric.to}?${query}` : undefined} />)}
       </section>
+      <DashboardSavingsGoal data={savingsGoal} loading={savingsGoalLoading} error={savingsGoalError} saving={savingsGoalSaving} notice={savingsGoalNotice} period={period} onRetry={loadSavingsGoal} onSave={saveSavingsGoal} onDelete={deleteSavingsGoal} />
       <section className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]" aria-label="Gráficas del dashboard">
         <CategoryExpensesChart data={categories} loading={loading} />
         <AnnualEvolutionChart data={annual} loading={loading} />
       </section>
-      <section className="flex flex-col justify-between gap-6 border border-[#e7e5e4] bg-[#f5f5f4] p-6 sm:flex-row sm:items-center"><div><p className="text-sm font-semibold text-[#1c1917]">¿Quieres mantener tus números al día?</p><p className="mt-1 text-sm text-[#57534e]">Registra un movimiento y el resumen se actualizará automáticamente.</p></div><div className="flex flex-wrap gap-3"><Link to={`/ingresos?${query}`} className="thought-focus inline-flex min-h-10 items-center gap-2 border border-[#d6d3d1] bg-[#fafaf9] px-4 py-2 text-sm font-semibold text-[#57534e] transition-colors hover:bg-[#efedeb]"><ArrowDownLeft size={16} /> Ver ingresos</Link><Link to={`/egresos/nuevo?${query}`} className="thought-focus inline-flex min-h-10 items-center gap-2 border border-[#78716c] bg-[#78716c] px-4 py-2 text-sm font-semibold text-[#fafaf9] transition-colors hover:bg-[#57534e]">Registrar egreso <ArrowRight size={16} /></Link></div></section>
-      <p className="flex items-center gap-2 text-xs text-[#78716c]"><CircleHelp size={14} /> Los totales se consultan desde tu cuenta y el período seleccionado.</p>
+      <section className="flex flex-col justify-between gap-5 rounded-xl border border-white/10 bg-[#111116] p-5 shadow-lg shadow-black/20 sm:flex-row sm:items-center sm:p-6"><div><p className="text-sm font-semibold text-white">¿Quieres mantener tus números al día?</p><p className="mt-1 text-sm text-[#858290]">Registra un movimiento y el resumen se actualizará automáticamente.</p></div><div className="flex flex-wrap gap-2"><Link to={`/ingresos?${query}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 px-3.5 py-2 text-sm font-semibold text-[#c5ed83] transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ae7bff]"><ArrowDownLeft size={16} /> Ver ingresos</Link><Link to={`/egresos/nuevo?${query}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#ae7bff] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#bd91ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ae7bff]">Registrar egreso <ArrowRight size={16} /></Link></div></section>
+      <p className="flex items-center gap-2 text-xs text-[#8a968f]"><CircleHelp size={14} /> Los totales se consultan desde tu cuenta y el período seleccionado.</p>
     </div>
   )
 }

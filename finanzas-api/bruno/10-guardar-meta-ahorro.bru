@@ -1,0 +1,35 @@
+meta {
+  name: 10 - Guardar meta de ahorro
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{baseUrl}}/dashboard/meta-ahorro
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+body:json {
+  {
+    "anio": 2026,
+    "mes": 10,
+    "monto_objetivo": "500.00"
+  }
+}
+
+tests {
+  test("La meta de ahorro se guarda", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("meta");
+    expect(res.getBody().meta.monto_objetivo).to.equal("500.00");
+  });
+}

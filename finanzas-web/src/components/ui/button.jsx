@@ -2,18 +2,18 @@ import { cva } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonStyles = cva(
-  'thought-focus inline-flex items-center justify-center gap-2 whitespace-nowrap text-[15px] font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-55',
   {
     variants: {
       variant: {
-        primary: 'border border-[#78716c] bg-[#78716c] text-[#fafaf9] hover:bg-[#57534e]',
-        secondary: 'border border-[#d6d3d1] bg-transparent text-[#78716c] hover:bg-[#f5f5f4]',
-        ghost: 'text-[#78716c] hover:bg-[#f5f5f4]',
-        danger: 'border border-[#dc2626] bg-[#dc2626] text-[#fafaf9] hover:bg-[#b91c1c]',
+        primary: 'bg-[#123f35] text-white shadow-sm hover:bg-[#0d332b]',
+        secondary: 'border border-[#dce5df] bg-white text-[#234b40] hover:bg-[#f1f6f2]',
+        ghost: 'text-[#53665e] hover:bg-[#edf2ed] hover:text-[#173d33]',
+        danger: 'bg-rose-600 text-white hover:bg-rose-700',
       },
       size: {
-        default: 'min-h-12 px-6 py-3',
-        sm: 'min-h-9 px-4 py-2 text-[13px]',
+        default: 'min-h-11 px-4 py-2.5',
+        sm: 'min-h-9 rounded-lg px-3 text-xs',
         icon: 'size-10',
       },
     },

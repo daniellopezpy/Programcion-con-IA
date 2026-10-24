@@ -1,0 +1,29 @@
+meta {
+  name: 09 - Consultar meta de ahorro
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/dashboard/meta-ahorro?anio=2026&mes=10
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+tests {
+  test("La meta de ahorro se consulta por período", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("meta");
+    expect(res.getBody()).to.have.property("ingresos_acumulados");
+    expect(res.getBody()).to.have.property("porcentaje_progreso");
+    expect(res.getBody()).to.have.property("faltante");
+  });
+}

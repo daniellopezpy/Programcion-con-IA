@@ -34,6 +34,11 @@ class User extends Authenticatable
         return $this->hasMany(Ingreso::class);
     }
 
+    public function metasAhorro(): HasMany
+    {
+        return $this->hasMany(MetaAhorro::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

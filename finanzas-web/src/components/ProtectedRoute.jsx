@@ -7,9 +7,9 @@ export function ProtectedRoute() {
 
   if (status === 'loading') {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#fafaf9] px-6 text-[#1c1917]">
-        <div className="flex items-center gap-3 border border-[#e7e5e4] bg-[#f5f5f4] px-5 py-4 text-sm text-[#78716c]">
-          <span className="size-4 animate-spin rounded-full border-2 border-[#d6d3d1] border-t-[#78716c]" />
+      <main className="grid min-h-screen place-items-center bg-[#f6f7f4] px-6">
+        <div className="flex items-center gap-3 rounded-2xl border border-[#e5eae5] bg-white px-5 py-4 text-sm text-[#557067] shadow-sm">
+          <span className="size-4 animate-spin rounded-full border-2 border-[#d5e4dc] border-t-[#1a6955]" />
           Comprobando tu sesión…
         </div>
       </main>

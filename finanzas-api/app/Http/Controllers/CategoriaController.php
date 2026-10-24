@@ -5,15 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CategoriaRequest;
 use App\Http\Requests\IndexCategoriaRequest;
 use App\Models\Categoria;
-use App\Support\DashboardCache;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class CategoriaController extends Controller
 {
-    public function __construct(private readonly DashboardCache $dashboardCache) {}
-
     /**
      * Display a listing of the resource.
      */
@@ -40,7 +37,6 @@ class CategoriaController extends Controller
     public function store(CategoriaRequest $request): JsonResponse
     {
         $categoria = $request->user()->categorias()->create($request->validated());
-        $this->dashboardCache->invalidate($request->user()->getKey());
 
         return response()->json($categoria, 201);
     }
@@ -67,7 +63,6 @@ class CategoriaController extends Controller
     {
         $categoriaEncontrada = $request->user()->categorias()->findOrFail($categoria);
         $categoriaEncontrada->update($request->validated());
-        $this->dashboardCache->invalidate($request->user()->getKey());
 
         return response()->json($categoriaEncontrada);
     }
@@ -86,8 +81,6 @@ class CategoriaController extends Controller
                 'message' => 'La categoría no puede eliminarse porque está en uso.',
             ], 409);
         }
-
-        $this->dashboardCache->invalidate($request->user()->getKey());
 
         return response()->noContent();
     }

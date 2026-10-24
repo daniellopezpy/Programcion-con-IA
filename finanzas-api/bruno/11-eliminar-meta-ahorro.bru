@@ -1,0 +1,25 @@
+meta {
+  name: 11 - Eliminar meta de ahorro
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/dashboard/meta-ahorro?anio=2026&mes=10
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{anaToken}}
+}
+
+tests {
+  test("La meta de ahorro se elimina", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Categoria;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -137,43 +136,6 @@ class DashboardApiTest extends TestCase
         $this->getJson('/api/dashboard/resumen-anual')
             ->assertUnprocessable()
             ->assertJsonValidationErrors('anio');
-    }
-
-    public function test_resumen_cachea_por_usuario_periodo_y_se_invalida_al_crear_un_movimiento(): void
-    {
-        Cache::flush();
-        [$ana, , , , $empleo] = $this->crearContexto();
-        $this->crearIngreso($ana, $empleo, '2026-05-10', '1000.00');
-        Sanctum::actingAs($ana);
-
-        DB::flushQueryLog();
-        DB::enableQueryLog();
-
-        $this->getJson('/api/dashboard/resumen?anio=2026&mes=5')
-            ->assertOk()
-            ->assertJsonPath('ingresos_mes', '1000.00');
-        $consultasEnPrimeraCarga = count(DB::getQueryLog());
-
-        DB::flushQueryLog();
-        $this->getJson('/api/dashboard/resumen?anio=2026&mes=5')
-            ->assertOk()
-            ->assertJsonPath('ingresos_mes', '1000.00');
-
-        $this->assertGreaterThan(0, $consultasEnPrimeraCarga);
-        $this->assertCount(0, DB::getQueryLog());
-
-        $this->postJson('/api/ingresos', [
-            'categoria_id' => $empleo->id,
-            'fecha' => '2026-05-11',
-            'fuente' => 'Segundo trabajo',
-            'monto' => '500.00',
-        ])->assertCreated();
-
-        DB::flushQueryLog();
-        $this->getJson('/api/dashboard/resumen?anio=2026&mes=5')
-            ->assertOk()
-            ->assertJsonPath('ingresos_mes', '1500.00');
-        $this->assertGreaterThan(0, count(DB::getQueryLog()));
     }
 
     /** @return array{User, User, Categoria, Categoria, Categoria} */
