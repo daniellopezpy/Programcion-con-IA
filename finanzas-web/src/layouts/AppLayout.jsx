@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChartNoAxesColumnIncreasing, CircleHelp, House, Plus, UserRound } from 'lucide-react'
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChartNoAxesColumnIncreasing, House, Plus, UserRound } from 'lucide-react'
+import { Link, NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { BrandLogo } from '@/components/BrandLogo'
 import { BrandIntro } from '@/components/BrandIntro'
 import { SaldoTour } from '@/components/SaldoTour'
-import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/useAuth'
 import { DashboardPeriodProvider, useDashboardPeriod } from '@/context/dashboard-period'
 import './app-shell.css'
@@ -19,41 +18,6 @@ const movementOptions = [
   { route: '/ingresos/nuevo', label: 'Nuevo ingreso', detail: 'Sueldo, pago u otro dinero recibido', icon: ArrowDownLeft },
   { route: '/egresos/nuevo', label: 'Nuevo egreso', detail: 'Compra, factura u otro gasto', icon: ArrowUpRight },
 ]
-
-function hasSeenTour(key) {
-  try {
-    return JSON.parse(localStorage.getItem(key))?.completed === true
-  } catch {
-    return false
-  }
-}
-
-function Welcome({ onGuide, onHome, onExpense }) {
-  const dialog = useRef(null)
-  useEffect(() => {
-    const element = dialog.current
-    element.showModal()
-    return () => element.close()
-  }, [])
-
-  function continueTo(destination) {
-    dialog.current.close()
-    destination()
-  }
-
-  return (
-    <dialog ref={dialog} className="saldo-movement-dialog" aria-labelledby="saldo-welcome-title"
-      onCancel={(event) => { event.preventDefault(); continueTo(onHome) }}>
-      <h2 id="saldo-welcome-title">Te damos la bienvenida a Saldo</h2>
-      <p className="mt-2 text-sm text-[var(--saldo-muted)]">En tres pasos verás dónde consultar tu saldo, registrar un gasto y revisar tus movimientos.</p>
-      <div className="mt-5 grid gap-2">
-        <Button onClick={() => continueTo(onGuide)}><CircleHelp size={18} aria-hidden="true" /> Ver guía de Saldo</Button>
-        <Button variant="secondary" onClick={() => continueTo(onExpense)}><ArrowUpRight size={18} aria-hidden="true" /> Registrar mi primer gasto</Button>
-        <Button variant="ghost" onClick={() => continueTo(onHome)}>Ir a Inicio</Button>
-      </div>
-    </dialog>
-  )
-}
 
 function NavigationLink({ item, query }) {
   const { to, label, icon: Icon, end } = item
@@ -75,15 +39,11 @@ function AppShell() {
   const { query } = useDashboardPeriod()
   const navigate = useNavigate()
   const { pathname, search, state } = useLocation()
+  const navigationType = useNavigationType()
   const movementDialog = useRef(null)
   const [showIntro, setShowIntro] = useState(true)
   const [movementOpen, setMovementOpen] = useState(false)
-  const onboardingKey = `saldo.onboarding:${user.id}`
-  const [tourSeen, setTourSeen] = useState(() => hasSeenTour(onboardingKey))
-  const tourRequested = state?.showSaldoTour === true
-  const welcomeRequested = state?.showSaldoWelcome === true
-  const showTour = !showIntro && pathname === '/' && tourRequested
-  const showWelcome = !showIntro && pathname === '/' && !tourRequested && (welcomeRequested || !tourSeen)
+  const showTour = !showIntro && pathname === '/' && state?.showSaldoTour === true && navigationType !== 'POP'
   const initials = user?.name?.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'S'
 
   useEffect(() => {
@@ -93,17 +53,11 @@ function AppShell() {
   const finishIntro = useCallback(() => setShowIntro(false), [])
 
   function finishTour(destination) {
-    try {
-      localStorage.setItem(onboardingKey, JSON.stringify({ completed: true }))
-    } catch {
-      // The guide still stays dismissed for this session if storage is unavailable.
-    }
-    setTourSeen(true)
-    if (destination) navigate(`${destination}?${query}`, {
-      replace: tourRequested || welcomeRequested,
+    const next = destination ? `${destination}?${query}` : `${pathname}${search}`
+    navigate(next, {
+      replace: true,
       state: destination === analytics.to ? { useCurrentAnalyticsPeriod: true } : undefined,
     })
-    else if (tourRequested || welcomeRequested) navigate(`${pathname}${search}`, { replace: true, state: null })
   }
 
   function openMovement() {
@@ -170,14 +124,6 @@ function AppShell() {
         <button type="button" className="saldo-movement-cancel" onClick={() => movementDialog.current.close()}>Cancelar</button>
       </dialog>
       {showIntro && <BrandIntro onComplete={finishIntro} />}
-      {showWelcome && <Welcome
-        onGuide={() => navigate(`${pathname}${search}`, { replace: true, state: { showSaldoTour: true } })}
-        onHome={() => {
-          finishTour()
-          document.getElementById('saldo-home-heading')?.focus({ preventScroll: true })
-        }}
-        onExpense={() => finishTour('/egresos/nuevo')}
-      />}
       {showTour && <SaldoTour
         onFinish={() => {
           finishTour()
