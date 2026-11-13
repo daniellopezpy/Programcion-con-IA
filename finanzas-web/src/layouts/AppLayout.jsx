@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChartNoAxesColumnIncreasing, House, Plus, UserRound } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChartNoAxesColumnIncreasing, CircleHelp, House, Plus, UserRound } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BrandLogo } from '@/components/BrandLogo'
 import { BrandIntro } from '@/components/BrandIntro'
@@ -28,7 +28,7 @@ function hasSeenTour(key) {
   }
 }
 
-function Welcome({ onHome, onExpense }) {
+function Welcome({ onGuide, onHome, onExpense }) {
   const dialog = useRef(null)
   useEffect(() => {
     const element = dialog.current
@@ -45,10 +45,11 @@ function Welcome({ onHome, onExpense }) {
     <dialog ref={dialog} className="saldo-movement-dialog" aria-labelledby="saldo-welcome-title"
       onCancel={(event) => { event.preventDefault(); continueTo(onHome) }}>
       <h2 id="saldo-welcome-title">Te damos la bienvenida a Saldo</h2>
-      <p className="mt-2 text-sm text-[var(--saldo-muted)]">Registra un gasto para empezar a ver tus movimientos.</p>
+      <p className="mt-2 text-sm text-[var(--saldo-muted)]">En tres pasos verás dónde consultar tu saldo, registrar un gasto y revisar tus movimientos.</p>
       <div className="mt-5 grid gap-2">
-        <Button onClick={() => continueTo(onExpense)}><ArrowUpRight size={18} aria-hidden="true" /> Registrar mi primer gasto</Button>
-        <Button variant="secondary" onClick={() => continueTo(onHome)}>Ir a Inicio</Button>
+        <Button onClick={() => continueTo(onGuide)}><CircleHelp size={18} aria-hidden="true" /> Ver guía de Saldo</Button>
+        <Button variant="secondary" onClick={() => continueTo(onExpense)}><ArrowUpRight size={18} aria-hidden="true" /> Registrar mi primer gasto</Button>
+        <Button variant="ghost" onClick={() => continueTo(onHome)}>Ir a Inicio</Button>
       </div>
     </dialog>
   )
@@ -80,8 +81,9 @@ function AppShell() {
   const onboardingKey = `saldo.onboarding:${user.id}`
   const [tourSeen, setTourSeen] = useState(() => hasSeenTour(onboardingKey))
   const tourRequested = state?.showSaldoTour === true
+  const welcomeRequested = state?.showSaldoWelcome === true
   const showTour = !showIntro && pathname === '/' && tourRequested
-  const showWelcome = !showIntro && pathname === '/' && !tourSeen && !tourRequested
+  const showWelcome = !showIntro && pathname === '/' && !tourRequested && (welcomeRequested || !tourSeen)
   const initials = user?.name?.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'S'
 
   useEffect(() => {
@@ -98,10 +100,10 @@ function AppShell() {
     }
     setTourSeen(true)
     if (destination) navigate(`${destination}?${query}`, {
-      replace: tourRequested,
+      replace: tourRequested || welcomeRequested,
       state: destination === analytics.to ? { useCurrentAnalyticsPeriod: true } : undefined,
     })
-    else if (tourRequested) navigate(`${pathname}${search}`, { replace: true, state: null })
+    else if (tourRequested || welcomeRequested) navigate(`${pathname}${search}`, { replace: true, state: null })
   }
 
   function openMovement() {
@@ -168,10 +170,14 @@ function AppShell() {
         <button type="button" className="saldo-movement-cancel" onClick={() => movementDialog.current.close()}>Cancelar</button>
       </dialog>
       {showIntro && <BrandIntro onComplete={finishIntro} />}
-      {showWelcome && <Welcome onHome={() => {
-        finishTour()
-        document.getElementById('saldo-home-heading')?.focus({ preventScroll: true })
-      }} onExpense={() => finishTour('/egresos/nuevo')} />}
+      {showWelcome && <Welcome
+        onGuide={() => navigate(`${pathname}${search}`, { replace: true, state: { showSaldoTour: true } })}
+        onHome={() => {
+          finishTour()
+          document.getElementById('saldo-home-heading')?.focus({ preventScroll: true })
+        }}
+        onExpense={() => finishTour('/egresos/nuevo')}
+      />}
       {showTour && <SaldoTour
         onFinish={() => {
           finishTour()

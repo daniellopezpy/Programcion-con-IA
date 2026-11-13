@@ -28,7 +28,7 @@ export function RegisterPage() {
     setMessage('')
     try {
       await register(values)
-      navigate('/', { replace: true })
+      navigate('/', { replace: true, state: { showSaldoWelcome: true } })
     } catch (requestError) {
       setErrors(Object.fromEntries(Object.entries(requestError.errors || {}).map(([field, messages]) => [field, messages[0]])))
       setMessage(requestError.errors ? '' : requestError.message)
