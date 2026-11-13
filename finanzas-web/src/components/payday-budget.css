@@ -1,0 +1,220 @@
+.saldo-payday {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+  padding: clamp(1rem, 4vw, 1.4rem);
+  border: 1px solid var(--saldo-line, #dfe6db);
+  border-radius: 1.1rem;
+  background: var(--saldo-surface, #fffefa);
+}
+
+.saldo-payday h2 {
+  color: var(--saldo-ink, #14251d);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.saldo-payday-result,
+.saldo-payday-empty,
+.saldo-payday-form {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.saldo-payday-empty {
+  justify-items: start;
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.94rem;
+}
+
+.saldo-payday-empty > p[role="alert"] { color: var(--saldo-danger, #963d30); }
+
+.saldo-payday-result-text {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.saldo-payday-amount {
+  color: var(--saldo-forest, #123c30);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.saldo-payday-amount strong {
+  font-size: clamp(1.85rem, 7.5vw, 2.75rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
+}
+
+.saldo-payday-result[data-over="true"] .saldo-payday-amount { color: var(--saldo-danger, #963d30); }
+
+.saldo-payday-date {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.9375rem;
+}
+
+.saldo-payday-date time {
+  color: var(--saldo-ink, #14251d);
+  font-weight: 600;
+}
+
+.saldo-payday-usage {
+  display: grid;
+  gap: 0.5rem;
+  padding-block-start: 0.25rem;
+}
+
+.saldo-payday-meter {
+  --payday-fill: var(--saldo-forest, #123c30);
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 0.45rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--saldo-wash, #edf1e7);
+}
+
+.saldo-payday-result[data-over="true"] .saldo-payday-meter { --payday-fill: var(--saldo-danger, #963d30); }
+
+.saldo-payday-meter::-webkit-meter-bar {
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: var(--saldo-wash, #edf1e7);
+  box-shadow: none;
+}
+
+.saldo-payday-meter::-webkit-meter-optimum-value {
+  border-radius: inherit;
+  background: var(--payday-fill);
+}
+
+.saldo-payday-meter::-moz-meter-bar {
+  border-radius: 1rem;
+  background: var(--payday-fill);
+}
+
+.saldo-payday-totals {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.saldo-payday-totals > div { min-width: 0; }
+.saldo-payday-totals > div:last-child { margin-inline-start: auto; text-align: end; }
+.saldo-payday-totals dt { color: var(--saldo-muted, #596b60); }
+.saldo-payday-totals dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--saldo-ink, #14251d);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.saldo-payday-context {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+  padding-block-start: 0.7rem;
+  border-block-start: 1px solid var(--saldo-line, #dfe6db);
+}
+
+.saldo-payday-note {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.86rem;
+}
+
+.saldo-payday-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+}
+
+.saldo-payday-expense-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--saldo-forest, #123c30);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.saldo-payday-expense-link:hover { background: var(--saldo-wash, #edf1e7); }
+
+.saldo-payday-form h3 {
+  scroll-margin-block: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.saldo-payday-form h3:focus { outline: none; }
+
+.saldo-payday-fields {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  max-width: 36rem;
+}
+
+.saldo-payday-form input {
+  min-width: 0;
+  min-height: 2.75rem;
+  font-size: 1rem;
+}
+
+.saldo-payday-form p[id$="-hint"] { color: var(--saldo-muted, #596b60); }
+
+.saldo-payday-start {
+  display: grid;
+  max-width: 36rem;
+  padding-inline: 0.7rem;
+  border: 1px solid var(--saldo-line, #dfe6db);
+  border-radius: 0.65rem;
+  background: var(--saldo-page, #f7f7f0);
+}
+
+.saldo-payday-start > button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  gap: 0.25rem 0.65rem;
+  padding-block: 0.35rem;
+  text-align: left;
+  color: var(--saldo-ink, #14251d);
+  font-size: 0.88rem;
+}
+
+.saldo-payday-start-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--saldo-forest, #123c30);
+  font-weight: 700;
+}
+
+.saldo-payday-start > div:not([hidden]) {
+  display: grid;
+  gap: 0.35rem;
+  padding-block: 0.35rem 0.75rem;
+}
+
+@media (min-width: 36rem) {
+  .saldo-payday-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

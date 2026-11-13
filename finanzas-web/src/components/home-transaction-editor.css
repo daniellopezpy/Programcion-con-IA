@@ -1,0 +1,59 @@
+.saldo-transaction-editor,
+.saldo-transaction-editor-fields,
+.saldo-transaction-editor-pair {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.8rem;
+}
+
+.saldo-transaction-editor-fields {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.saldo-transaction-editor-field {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.375rem;
+}
+
+.saldo-transaction-editor textarea {
+  padding-block: 0.65rem;
+  resize: vertical;
+}
+
+.saldo-transaction-editor-status {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.875rem;
+}
+
+.saldo-transaction-editor-catalog {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.saldo-transaction-editor-actions {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  padding-block: 0.65rem 0.15rem;
+  border-block-start: 1px solid var(--saldo-line, #dfe6db);
+  background: var(--saldo-surface, #fffefa);
+}
+
+.saldo-transaction-editor-actions button {
+  min-inline-size: 0;
+  padding-inline: 0.75rem;
+}
+
+@media (min-width: 24rem) {
+  .saldo-transaction-editor-pair {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

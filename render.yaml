@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: saldo-beta
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: PORT
+        value: '8080'
+      - key: SALDO_APP_KEY_BASE64
+        generateValue: true
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_PORT
+        value: '4000'
+      - key: DB_HOST
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false

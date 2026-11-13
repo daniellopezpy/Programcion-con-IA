@@ -1,0 +1,264 @@
+.saldo-brand-logo {
+  --logo-ink: var(--saldo-forest, #123c30);
+  --logo-mark: var(--saldo-forest, #123c30);
+  --logo-bars: #f7f7f0;
+  --logo-dot: #4c876d;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  color: var(--logo-ink);
+  font-size: 1.2rem;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: -0.07em;
+}
+
+.saldo-brand-logo-inverse {
+  --logo-ink: #fffefa;
+  --logo-mark: #c4ddb2;
+  --logo-bars: #123c30;
+  --logo-dot: #c4ddb2;
+}
+
+.saldo-brand-mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.65rem;
+  background: var(--logo-mark);
+  color: var(--logo-bars);
+}
+
+.saldo-brand-dot { color: var(--logo-dot); }
+
+.saldo-auth {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--saldo-page, #f7f7f0);
+  color: var(--saldo-ink, #14251d);
+}
+
+.saldo-welcome {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-width: 0;
+  min-height: clamp(32rem, 87svh, 41rem);
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: clip;
+  padding: clamp(1.25rem, 5vw, 3.75rem);
+  background: radial-gradient(ellipse at 70% 78%, #316650 0%, transparent 55%), #12372b;
+  color: #fffefa;
+}
+
+.saldo-welcome::before {
+  position: absolute;
+  z-index: -1;
+  inset: auto -30% -27% -25%;
+  height: 62%;
+  border-radius: 50%;
+  background: linear-gradient(158deg, #5a9075 -14%, #285441 46%, #163a2e 77%);
+  transform: rotate(-17deg);
+  content: "";
+}
+
+.saldo-welcome-brand { display: inline-flex; align-items: center; min-height: 2.75rem; }
+
+.saldo-welcome-copy { margin-block: clamp(1.3rem, 4.5vh, 3rem) 0.5rem; }
+
+.saldo-welcome-copy h2 {
+  max-width: 16ch;
+  margin: 0;
+  font-size: clamp(2.55rem, 9vw, 5.2rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+}
+
+.saldo-welcome-copy h2 strong {
+  display: block;
+  color: #c4ddb2;
+  font-weight: inherit;
+}
+
+.saldo-welcome-copy p {
+  max-width: 29ch;
+  margin: 0.95rem 0 0;
+  color: #e2ece0;
+  font-size: clamp(0.875rem, 2.7vw, 1.05rem);
+  line-height: 1.45;
+}
+
+.saldo-welcome-art {
+  position: relative;
+  display: grid;
+  width: 100%;
+  flex: 1;
+  place-items: center;
+  align-self: center;
+  padding-block: 0.3rem 0.85rem;
+}
+
+.saldo-welcome-art::after {
+  position: absolute;
+  z-index: -1;
+  bottom: 6%;
+  left: 50%;
+  width: min(63%, 18rem);
+  height: 12%;
+  border-radius: 50%;
+  background: #0b241b;
+  transform: translateX(-50%);
+  opacity: 0.68;
+  filter: blur(10px);
+  content: "";
+}
+
+.saldo-welcome-art img {
+  display: block;
+  width: min(100%, clamp(14rem, 40svh, 23rem));
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 1.1rem 1rem #08281b85);
+}
+
+.saldo-welcome-action {
+  display: flex;
+  width: 100%;
+  min-height: 3.375rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding-inline: 1rem;
+  border-radius: 1rem;
+  background: var(--saldo-page, #f7f7f0);
+  color: var(--saldo-forest, #123c30);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.saldo-welcome-action:hover { background: #e4edda; }
+.saldo-welcome-action:focus-visible, .saldo-welcome-brand:focus-visible { outline: 2px solid #c4ddb2; outline-offset: 4px; }
+
+.saldo-auth-access {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  padding: clamp(2.5rem, 7vw, 5rem) clamp(1.25rem, 7vw, 4rem);
+  outline: none;
+}
+
+.saldo-auth-outlet {
+  width: min(100%, 27rem);
+  justify-self: center;
+}
+
+.saldo-auth-card-title { margin-block-end: clamp(1.5rem, 5vw, 2rem); }
+.saldo-auth-card-title h1 {
+  margin: 0;
+  color: var(--saldo-ink, #14251d);
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+}
+
+.saldo-auth-card-title p {
+  margin: 0.65rem 0 0;
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.saldo-auth-form { display: grid; gap: 1.125rem; }
+
+.saldo-auth-form label {
+  color: var(--saldo-ink, #14251d);
+  font-weight: 650;
+}
+
+.saldo-auth-form input {
+  min-height: 3.25rem;
+  border-color: #cdd9ce;
+  background: var(--saldo-surface, #fffefa);
+  color: var(--saldo-ink, #14251d);
+  font-size: 1rem;
+  box-shadow: none;
+}
+
+.saldo-auth-form input::placeholder { color: #697970; }
+.saldo-auth-form input:focus { border-color: var(--saldo-moss, #4c876d); box-shadow: 0 0 0 3px #4c876d30; }
+.saldo-auth-form input[aria-invalid="true"] { border-color: #b85b62; }
+.saldo-auth-form .saldo-auth-submit {
+  min-height: 3.375rem;
+  margin-block-start: 0.4rem;
+  border-radius: 1rem;
+  background: var(--saldo-forest, #123c30);
+  color: #fffefa;
+  font-size: 1rem;
+}
+
+.saldo-auth-form .saldo-auth-submit:hover { background: #1d503e; }
+
+.saldo-auth-switch {
+  margin: 1.5rem 0 0;
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.saldo-auth-switch a { color: var(--saldo-forest, #123c30); font-weight: 700; text-decoration: underline; text-underline-offset: 0.2em; }
+.saldo-auth-privacy { display: flex; justify-content: center; align-items: center; gap: 0.4rem; margin: 1rem 0 0; color: var(--saldo-muted, #596b60); font-size: 0.75rem; }
+
+.brand-intro.saldo-intro {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--saldo-ink, #14251d);
+}
+
+.brand-intro.saldo-intro { background: radial-gradient(ellipse at 50% 60%, #2d624a, transparent 62%), #11352a; }
+.saldo-intro-content { transform: scale(1.55); }
+.saldo-intro-skip { position: absolute; right: clamp(1rem, 5vw, 2.25rem); bottom: max(1.25rem, env(safe-area-inset-bottom)); min-height: 3rem; padding: 0 0.85rem; color: #e2ece0; font-size: 0.9rem; font-weight: 650; }
+.saldo-intro-skip:hover { color: #fff; }
+.saldo-intro-skip:focus-visible { outline: 2px solid #c4ddb2; outline-offset: 2px; border-radius: 0.5rem; }
+
+@media (min-width: 58rem) {
+  .saldo-auth { grid-template-columns: minmax(0, 1fr) minmax(0, 0.94fr); }
+  .saldo-welcome { min-height: 100svh; padding-inline: clamp(2.5rem, 6vw, 6rem); }
+  .saldo-welcome-copy { margin-block-start: clamp(2rem, 7vh, 5rem); }
+  .saldo-welcome-art img { width: min(100%, clamp(18rem, 43svh, 29rem)); }
+  .saldo-welcome-action { display: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.saldo-welcome-action, .saldo-auth-form .saldo-auth-submit) { transition: background-color 160ms ease, transform 160ms ease; }
+  :is(.saldo-welcome-action, .saldo-auth-form .saldo-auth-submit):active { transform: scale(0.985); }
+  .saldo-welcome-art img { animation: saldo-wallet-arrive 1s cubic-bezier(.2, .72, .22, 1) both; }
+  .saldo-intro-content { animation: saldo-intro-enter 3s ease both; }
+  .saldo-intro-content .saldo-brand-bar { transform-box: fill-box; transform-origin: center bottom; animation: saldo-intro-bar 550ms cubic-bezier(.18, .75, .24, 1) both; }
+  .saldo-intro-content .saldo-brand-bar:nth-child(2) { animation-delay: 110ms; }
+  .saldo-intro-content .saldo-brand-bar:nth-child(3) { animation-delay: 220ms; }
+}
+
+@keyframes saldo-wallet-arrive {
+  from { opacity: 0; transform: translateY(1rem) rotate(-3deg); }
+  to { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes saldo-intro-bar {
+  from { opacity: 0.15; transform: scaleY(0.2); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes saldo-intro-enter {
+  0% { opacity: 0; transform: scale(1.42); }
+  18%, 84% { opacity: 1; transform: scale(1.55); }
+  100% { opacity: 0; transform: scale(1.58); }
+}

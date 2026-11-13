@@ -1,0 +1,171 @@
+.saldo-chart-card {
+  min-width: 0;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: 1px solid var(--saldo-line, #dfe6db);
+  border-radius: 1.4rem;
+  background: var(--saldo-surface, #fffefa);
+  color: var(--saldo-ink, #14251d);
+}
+
+.saldo-chart-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.saldo-chart-heading h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.saldo-chart-heading > span {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.saldo-chart-donut {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 14rem, 52vw);
+  aspect-ratio: 1;
+  margin: 1.1rem auto 1.2rem;
+}
+
+.saldo-chart-donut-visual {
+  position: absolute;
+  inset: 0;
+}
+
+.saldo-chart-donut-empty {
+  position: absolute;
+  inset: 0.125rem;
+  border: clamp(1.2rem, 6vw, 2rem) solid var(--saldo-wash, #edf1e7);
+  border-radius: 50%;
+}
+
+.saldo-chart-donut-label {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 67%;
+  gap: 0.1rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.saldo-chart-donut-label strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.2rem, 5.3vw, 1.8rem);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.06em;
+  line-height: 1.1;
+}
+
+.saldo-chart-donut-label span {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.77rem;
+}
+
+.saldo-chart-categories {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem clamp(0.65rem, 3vw, 1.35rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.saldo-chart-categories li {
+  display: grid;
+  grid-template-columns: 0.55rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(0.75rem, 3.1vw, 0.9rem);
+}
+
+@media (max-width: 28rem) {
+  .saldo-chart-categories {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.saldo-chart-categories li > span:first-child,
+.saldo-chart-series li > span {
+  display: inline-block;
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+}
+
+.saldo-chart-categories strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.saldo-chart-empty,
+.saldo-chart-placeholder {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.saldo-chart-placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 10rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.85rem;
+  background: var(--saldo-wash, #edf1e7);
+}
+
+.saldo-chart-trend {
+  height: clamp(10rem, 38vw, 14rem);
+  margin-top: 1rem;
+}
+
+.saldo-chart-tooltip {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--saldo-line, #dfe6db);
+  border-radius: 0.75rem;
+  background: var(--saldo-surface, #fffefa);
+  color: var(--saldo-ink, #14251d);
+  font-size: 0.75rem;
+}
+
+.saldo-chart-tooltip p {
+  margin-bottom: 0.3rem;
+  font-weight: 700;
+}
+
+.saldo-chart-tooltip div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.saldo-chart-series {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.75rem;
+  list-style: none;
+}
+
+.saldo-chart-series li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}

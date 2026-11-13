@@ -1,0 +1,36 @@
+.finance-dialog {
+  width: min(32rem, calc(100% - 1.5rem));
+  max-height: calc(100dvh - 1.5rem);
+  margin: auto;
+  padding: clamp(1rem, 4vw, 1.65rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--saldo-line);
+  border-radius: 1.2rem;
+  background: var(--saldo-surface);
+  color: var(--saldo-ink);
+}
+.finance-dialog::backdrop { background: rgb(15 38 29 / 56%); }
+.finance-dialog > h1 { margin-block-end: .85rem; color: var(--saldo-forest); font-size: .9rem; font-weight: 700; }
+.finance-setup { display: grid; gap: .9rem; min-width: 0; }
+.finance-step-label { color: var(--saldo-muted); font-size: .83rem; }
+.finance-setup h2 { color: var(--saldo-ink); font-size: clamp(1.2rem, 4.5vw, 1.55rem); font-weight: 700; line-height: 1.2; }
+.finance-choices { display: grid; min-width: 0; gap: .5rem; }
+.finance-choices legend { margin-block-end: .45rem; color: var(--saldo-muted); font-size: .89rem; }
+.finance-choice-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; }
+.finance-choice-list label { position: relative; display: flex; align-items: center; justify-content: space-between; gap: .25rem; min-height: 3rem; padding: .5rem .65rem; border: 1px solid var(--saldo-line); border-radius: .55rem; cursor: pointer; }
+.finance-choice-list label:has(:checked) { border-color: var(--saldo-moss); background: var(--saldo-wash); color: var(--saldo-forest); font-weight: 700; }
+.finance-choice-list label:has(:focus-visible) { outline: 2px solid var(--saldo-moss); outline-offset: 2px; }
+.finance-choice-list label svg { flex: none; visibility: hidden; }
+.finance-choice-list label:has(:checked) svg { visibility: visible; }
+.finance-choice-list input { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; }
+.finance-card-list { display: grid; gap: .6rem; min-width: 0; }
+.finance-card-list > p, .finance-setup-note { display: flex; align-items: flex-start; gap: .4rem; }
+.finance-card-list > p { font-size: .9rem; font-weight: 700; }
+.finance-card-types, .finance-setup-actions { display: flex; flex-wrap: wrap; gap: .45rem; }
+.finance-card-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .4rem; }
+.finance-card-row input, .finance-last-fields input { min-width: 0; font-size: 1rem; }
+.finance-setup-note, .finance-card-list small { color: var(--saldo-muted); font-size: .8rem; }
+.finance-setup-note svg { flex: none; }
+.finance-last-fields { display: grid; gap: .8rem; }
+.finance-setup-actions { justify-content: flex-end; }

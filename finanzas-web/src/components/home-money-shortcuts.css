@@ -1,0 +1,51 @@
+.saldo-home-money-dialog {
+  width: min(26rem, calc(100% - 1.5rem));
+  max-block-size: calc(100dvh - 1.5rem);
+  margin: auto;
+  padding: clamp(0.9rem, 4vw, 1.35rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--saldo-line);
+  border-radius: 1rem;
+  background: var(--saldo-surface);
+  color: var(--saldo-ink);
+}
+.saldo-home-money-dialog::backdrop { background: rgb(15 38 29 / 50%); }
+.saldo-home-money-dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+  margin-block-end: 0.15rem;
+}
+.saldo-home-money-dialog h2 { font-size: 1.27rem; font-weight: 700; }
+.saldo-home-money-dialog header button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: 50%;
+  color: var(--saldo-forest);
+}
+.saldo-home-money-dialog header button:hover { background: var(--saldo-wash); }
+.saldo-home-money-dialog p { color: var(--saldo-muted); font-size: 0.9rem; }
+.saldo-home-money-dialog form { display: grid; gap: 0.85rem; margin-block-start: 1rem; }
+.saldo-home-money-dialog input { min-inline-size: 0; min-block-size: 3rem; font-size: 1rem; }
+.saldo-home-money-dialog .saldo-home-money-note { font-size: 0.82rem; }
+.saldo-home-money-note strong { color: var(--saldo-ink); }
+.saldo-home-money-dialog p[role="alert"] { color: var(--saldo-danger); }
+.saldo-home-money-retry { display: grid; gap: 0.35rem; }
+.saldo-home-money-retry a {
+  display: inline-flex;
+  min-block-size: 2.75rem;
+  align-items: center;
+  color: var(--saldo-forest);
+  font-size: 0.88rem;
+  font-weight: 650;
+  text-decoration: underline;
+}
+
+@media (max-width: 30rem) {
+  .saldo-home-money-dialog { margin-block-end: max(0.75rem, env(safe-area-inset-bottom)); }
+}

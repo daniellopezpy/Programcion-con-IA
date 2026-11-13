@@ -1,0 +1,50 @@
+.movement-details {
+  min-inline-size: 0;
+  border: 1px solid var(--saldo-line, #dfe6db);
+  border-radius: 0.85rem;
+  background: var(--saldo-wash, #edf1e7);
+}
+
+.movement-details-toggle {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  inline-size: 100%;
+  min-block-size: 3.4rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: inherit;
+  color: var(--saldo-forest, #123c30);
+  cursor: pointer;
+  text-align: start;
+}
+
+.movement-details-toggle strong,
+.movement-details-toggle small {
+  display: block;
+}
+
+.movement-details-toggle strong {
+  font-size: 0.875rem;
+}
+
+.movement-details-toggle small {
+  color: var(--saldo-muted, #596b60);
+  font-size: 0.8125rem;
+}
+
+.movement-details-toggle[aria-expanded="true"] .movement-details-chevron {
+  transform: rotate(180deg);
+}
+
+.movement-details-toggle:focus-visible {
+  outline: 2px solid var(--saldo-moss, #4c876d);
+  outline-offset: 2px;
+}
+
+.movement-details-fields {
+  display: grid;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-block-start: 1px solid var(--saldo-line, #dfe6db);
+}

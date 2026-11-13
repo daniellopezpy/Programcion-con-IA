@@ -1,0 +1,157 @@
+.home-checkin {
+  display: grid;
+  gap: .9rem;
+  min-width: 0;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: 1px solid var(--saldo-line);
+  border-radius: 1.15rem;
+  background: var(--saldo-surface);
+}
+
+.home-recap {
+  background: radial-gradient(ellipse at 4% 0%, var(--saldo-wash), transparent 65%), var(--saldo-surface);
+}
+
+.home-checkin-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .75rem;
+}
+
+.home-checkin-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: .8rem;
+  background: var(--saldo-wash);
+  color: var(--saldo-forest);
+}
+
+.home-recap .home-checkin-icon { background: var(--saldo-surface); }
+.home-checkin-header h2 { font-size: clamp(1.125rem, 4.8vw, 1.35rem); font-weight: 700; line-height: 1.15; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.home-checkin-header p, .home-checkin-note { color: var(--saldo-muted); font-size: .88rem; }
+.home-checkin-header p { margin-block-start: .24rem; }
+
+.home-checkin-dismiss {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  color: var(--saldo-forest);
+}
+.home-checkin-dismiss:hover { background: var(--saldo-surface); }
+
+.home-recap-totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .7rem 1rem;
+  padding-block: .85rem;
+  border-block: 1px solid var(--saldo-line);
+}
+.home-recap-totals dt { color: var(--saldo-muted); font-size: .875rem; }
+.home-recap-totals dd {
+  font-size: clamp(.975rem, 4vw, 1.15rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.home-recap-balance { grid-column: 1 / -1; color: var(--saldo-forest); }
+.home-recap-balance dd { font-size: clamp(1.7rem, 8vw, 2.65rem); line-height: 1.14; letter-spacing: -.045em; }
+.home-recap-totals dd[data-negative="true"] { color: var(--saldo-danger); }
+
+.home-savings-overview, .home-savings-empty {
+  display: grid;
+  gap: .75rem;
+  min-width: 0;
+  padding: clamp(.9rem, 4vw, 1.2rem);
+  border: 1px solid var(--saldo-line);
+  border-radius: .85rem;
+  background: radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--saldo-lime) 45%, transparent), transparent 72%), var(--saldo-wash);
+}
+.home-savings-totals {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .8fr);
+  align-items: end;
+  gap: .6rem 1rem;
+  padding-block-start: .7rem;
+  border-block-start: 1px solid #d4dfd2;
+}
+.home-savings-totals > div:last-child { text-align: end; }
+.home-savings-totals dt { color: var(--saldo-muted); font-size: .875rem; }
+.home-savings-totals dd {
+  margin-block-start: .2rem;
+  color: var(--saldo-forest);
+  font-size: clamp(1.1rem, 3.8vw, 1.7rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.home-savings-meter {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: .65rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: .45rem;
+  background: #d4dfd2;
+  accent-color: var(--saldo-forest);
+}
+.home-savings-meter::-webkit-progress-bar { background: #d4dfd2; }
+.home-savings-meter::-webkit-progress-value { background: linear-gradient(90deg, var(--saldo-forest), var(--saldo-moss)); }
+.home-savings-meter::-moz-progress-bar { background: linear-gradient(90deg, var(--saldo-forest), var(--saldo-moss)); }
+.home-savings-status {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .35rem .8rem;
+  color: var(--saldo-forest);
+  font-size: .875rem;
+}
+.home-savings-reached { display: inline-flex; align-items: center; gap: .35rem; font-weight: 650; }
+.home-savings-reached svg { flex: none; }
+.home-savings-percentage { font-variant-numeric: tabular-nums; }
+.home-savings-percentage strong { font-size: clamp(1.55rem, 6.5vw, 2.25rem); letter-spacing: -.045em; line-height: 1; }
+.home-savings-note { color: var(--saldo-muted); font-size: .8125rem; }
+
+.home-checkin-feedback {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  font-size: .88rem;
+}
+.home-checkin-feedback [role="alert"] { color: var(--saldo-danger); }
+.home-checkin-action {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: .5rem;
+  min-height: 3rem;
+  padding: .4rem .8rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: .7rem;
+  background: var(--saldo-surface);
+  color: var(--saldo-forest);
+  font-size: .88rem;
+  font-weight: 700;
+}
+.home-checkin-action:hover { background: var(--saldo-wash); }
+.home-checkin-action svg { flex: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-checkin-action, .home-checkin-action svg { transition: background-color 160ms ease, transform 160ms ease; }
+  .home-checkin-action:active svg { transform: translateX(2px); }
+}
+
+@media (min-width: 40rem) {
+  .home-recap-totals { grid-template-columns: 1.3fr repeat(2, minmax(0, 1fr)); align-items: end; }
+  .home-recap-balance { grid-column: auto; }
+}

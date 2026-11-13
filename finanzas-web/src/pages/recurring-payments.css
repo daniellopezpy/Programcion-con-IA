@@ -1,0 +1,230 @@
+.recurring-payments {
+  display: grid;
+  gap: 1rem;
+  min-inline-size: 0;
+}
+
+.recurring-back {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 0.45rem;
+  min-block-size: 2.75rem;
+  color: var(--saldo-forest);
+  font-weight: 650;
+}
+
+.recurring-back:hover { text-decoration: underline; }
+
+.recurring-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.recurring-heading h1 {
+  font-size: clamp(1.95rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+}
+
+.recurring-heading p {
+  margin-block-start: 0.45rem;
+  color: var(--saldo-muted);
+}
+
+.recurring-note {
+  color: var(--saldo-muted);
+  font-size: 0.875rem;
+}
+
+.recurring-notice { color: var(--saldo-forest); }
+.recurring-notice:empty { position: absolute; }
+
+.recurring-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 5.5rem;
+  padding: 1.1rem;
+  border: 1px dashed var(--saldo-line);
+  border-radius: 1rem;
+  background: var(--saldo-surface);
+  color: var(--saldo-muted);
+}
+
+.recurring-empty svg { flex: none; color: var(--saldo-forest); }
+
+.recurring-period {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  max-inline-size: 22rem;
+}
+
+.recurring-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recurring-card {
+  display: grid;
+  align-content: start;
+  gap: 0.65rem;
+  inline-size: 100%;
+  min-block-size: 100%;
+  padding: clamp(0.9rem, 4vw, 1.25rem);
+  border: 1px solid #2b5144;
+  border-radius: 1.25rem;
+  background: linear-gradient(140deg, #204e40, var(--saldo-forest) 72%);
+  color: #f9fcf5;
+  text-align: start;
+}
+
+.recurring-card:hover { background: linear-gradient(140deg, #275848, #174337 72%); }
+
+.recurring-card-header {
+  display: grid;
+  grid-template-columns: 2.65rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  margin-block-end: 0.2rem;
+}
+
+.recurring-card-icon {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: rgb(237 241 231 / 15%);
+  color: #edf5e9;
+}
+
+.recurring-card-name { display: grid; gap: 0.1rem; overflow-wrap: anywhere; }
+.recurring-card-name > strong { font-size: 1.15rem; line-height: 1.15; }
+.recurring-card-name > span { color: #d2e5d9; font-size: 0.8rem; }
+.recurring-card-chevron { color: #d2e5d9; }
+.recurring-card-amount {
+  font-size: clamp(1.55rem, 5.5vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.recurring-card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  align-items: baseline;
+  gap: 0.4rem;
+  padding-block-start: 0.55rem;
+  border-block-start: 1px solid rgb(237 241 231 / 22%);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.recurring-card-row > :first-child { color: #d2e5d9; }
+.recurring-card-row > :last-child { text-align: end; font-weight: 650; }
+
+.recurring-card-dates { display: grid; gap: 0.3rem; }
+
+.recurring-card-date {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+}
+
+.recurring-card-paid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding-inline: 0.35rem;
+  border-radius: 0.35rem;
+  background: rgb(237 241 231 / 15%);
+  color: #edf5e9;
+  font-size: 0.75rem;
+}
+
+.recurring-dialog {
+  position: fixed;
+  inset: auto 0 0;
+  inline-size: min(100%, 32rem);
+  max-inline-size: none;
+  max-block-size: calc(100vh - 1rem);
+  max-block-size: min(88dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 0.75rem));
+  margin: 0 auto;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--saldo-line);
+  border-block-end: 0;
+  border-radius: 1.25rem 1.25rem 0 0;
+  background: var(--saldo-surface);
+  color: var(--saldo-ink);
+}
+
+.recurring-dialog::backdrop { background: rgb(16 46 37 / 46%); }
+html:has(.recurring-dialog) { scrollbar-gutter: stable; }
+html:has(.recurring-dialog[open]) { overflow: hidden; }
+
+.recurring-dialog-content {
+  display: grid;
+  gap: 0.85rem;
+  min-inline-size: 0;
+  padding: 1rem clamp(1rem, 5vw, 1.5rem) calc(1.15rem + env(safe-area-inset-bottom, 0px));
+}
+
+.recurring-dialog-header {
+  position: sticky;
+  z-index: 1;
+  inset-block-start: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--saldo-surface);
+}
+
+.recurring-dialog-content h2 { font-size: 1.45rem; font-weight: 700; line-height: 1.15; }
+.recurring-dialog-content strong { overflow-wrap: anywhere; }
+.recurring-field { display: grid; gap: 0.375rem; min-inline-size: 0; }
+.recurring-field span { color: var(--saldo-ink); font-size: 0.875rem; font-weight: 650; }
+.recurring-field select {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 2.75rem;
+  padding-inline: 0.6rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: 0.75rem;
+  background: white;
+  color: var(--saldo-ink);
+}
+
+.recurring-dialog input, .recurring-dialog select { font-size: 1rem; }
+.recurring-days { display: grid; gap: 0.6rem; }
+.recurring-days[data-pair='true'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.recurring-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.recurring-actions button { padding-inline: 0.55rem; white-space: normal; }
+.recurring-delete { justify-self: start; color: var(--saldo-danger); }
+
+@media (min-width: 36rem) {
+  .recurring-dialog { inset-block-end: 1rem; border-block-end: 1px solid var(--saldo-line); border-radius: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .recurring-dialog[open] { animation: recurring-dialog-in 240ms cubic-bezier(.2, .75, .25, 1) both; }
+
+  @keyframes recurring-dialog-in {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+}

@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --saldo-page: #f7f7f0;
+  --saldo-surface: #fffefa;
+  --saldo-ink: #14251d;
+  --saldo-muted: #596b60;
+  --saldo-line: #dfe6db;
+  --saldo-forest: #123c30;
+  --saldo-moss: #4c876d;
+  --saldo-wash: #edf1e7;
+  --saldo-lime: #dceab8;
+  --saldo-danger: #963d30;
+  --chart-1: #123c30;
+  --chart-2: #4c876d;
+  --chart-3: #a9bc9e;
+  --chart-grid: #dfe6db;
+  font-family: var(--font-sans);
+  color: var(--saldo-ink);
+  background: var(--saldo-page);
+  color-scheme: light;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { min-height: 100vh; margin: 0; }
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled) { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+:where(a, button, input, select, textarea):focus-visible { outline: 2px solid var(--saldo-moss); outline-offset: 3px; }
+::selection { color: var(--saldo-forest); background: var(--saldo-lime); }

@@ -1,0 +1,194 @@
+.saldo-app { min-height: 100dvh; background: var(--saldo-page); color: var(--saldo-ink); }
+.saldo-rail { display: none; }
+
+.saldo-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4rem;
+  padding: 0.65rem 1.15rem;
+  padding-block-start: calc(0.65rem + env(safe-area-inset-top));
+}
+
+.saldo-topbar-brand { display: inline-flex; align-items: center; min-height: 2.75rem; }
+.saldo-topbar-actions { display: flex; align-items: center; gap: 0.3rem; margin-inline-start: auto; }
+.saldo-topbar-shortcut { display: grid; place-content: center; justify-items: center; gap: 0.12rem; min-inline-size: 2.75rem; min-block-size: 2.75rem; padding-inline: 0.3rem; border-radius: 0.7rem; color: var(--saldo-forest); font-size: 0.6875rem; font-weight: 650; }
+.saldo-topbar-shortcut:hover { background: var(--saldo-wash); }
+.saldo-topbar-profile { display: inline-flex; align-items: center; gap: 0.65rem; min-width: 0; }
+.saldo-topbar-name { display: none; }
+.saldo-avatar {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.75rem;
+  aspect-ratio: 1;
+  border: 1px solid #d5e1cd;
+  border-radius: 50%;
+  background: var(--saldo-wash);
+  color: var(--saldo-forest);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.saldo-main {
+  width: min(100%, 70rem);
+  margin-inline: auto;
+  padding: 0.75rem 1.15rem calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+.saldo-dock {
+  position: fixed;
+  z-index: 20;
+  inset: auto 0 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  padding: 0.45rem max(0.45rem, env(safe-area-inset-right)) max(0.45rem, env(safe-area-inset-bottom)) max(0.45rem, env(safe-area-inset-left));
+  border-top: 1px solid var(--saldo-line);
+  background: var(--saldo-surface);
+  box-shadow: 0 -3px 20px #193e2410;
+}
+
+.saldo-nav-link {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  min-height: 3.15rem;
+  min-width: 2.75rem;
+  padding-inline: 0.18rem;
+  border-radius: 0.65rem;
+  color: var(--saldo-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.saldo-nav-link[aria-current="page"] { color: var(--saldo-forest); font-weight: 700; }
+.saldo-nav-link[aria-current="page"] svg { stroke-width: 2.6px; }
+.saldo-dock-action {
+  display: grid;
+  place-items: center;
+  width: 3.45rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--saldo-forest);
+  color: var(--saldo-surface);
+}
+
+.saldo-dock-action:hover, .saldo-rail-action:hover { background: #205444; color: var(--saldo-surface); }
+.saldo-movement-dialog {
+  width: min(27rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 1.2rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: 1rem;
+  background: var(--saldo-surface);
+  color: var(--saldo-ink);
+  overscroll-behavior: contain;
+}
+.saldo-movement-dialog::backdrop { background: rgb(15 38 29 / 50%); }
+.saldo-movement-dialog h2 { margin-block-end: 0.9rem; font-size: 1.2rem; font-weight: 700; }
+.saldo-movement-options { display: grid; gap: 0.5rem; }
+.saldo-movement-option {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 3.5rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: 0.65rem;
+  color: var(--saldo-forest);
+}
+.saldo-movement-option > svg { flex-shrink: 0; }
+.saldo-movement-option strong, .saldo-movement-option small { display: block; }
+.saldo-movement-option small { color: var(--saldo-muted); }
+.saldo-movement-option:hover, .saldo-movement-cancel:hover { background: var(--saldo-wash); }
+.saldo-movement-cancel {
+  display: block;
+  min-height: 3rem;
+  margin-block-start: 0.65rem;
+  margin-inline-start: auto;
+  padding-inline: 0.8rem;
+  border-radius: 0.65rem;
+  color: var(--saldo-forest);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .saldo-dock-action { transition: transform 150ms ease, background-color 150ms ease; }
+  .saldo-dock-action:active { transform: scale(0.95); }
+}
+
+@media (max-width: 63.99rem) {
+  .saldo-movement-dialog {
+    margin-block: auto max(0.75rem, env(safe-area-inset-bottom));
+  }
+}
+.saldo-profile { max-width: 36rem; }
+.saldo-profile h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.045em; }
+.saldo-profile-account {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-block: 1.1rem;
+  padding: 1.2rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: 1rem;
+  background: var(--saldo-surface);
+  overflow-wrap: anywhere;
+}
+.saldo-profile-account p { color: var(--saldo-muted); font-size: 0.88rem; }
+
+@media (min-width: 48rem) {
+  .saldo-topbar { padding-inline: 2rem; }
+  .saldo-topbar-name { display: inline; font-weight: 600; font-size: 0.9rem; }
+  .saldo-main { padding-inline: 2rem; }
+}
+
+@media (min-width: 64rem) {
+  .saldo-app { --saldo-rail-width: 14.75rem; }
+  .saldo-rail {
+    position: fixed;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    width: var(--saldo-rail-width);
+    padding: 1.4rem 1rem;
+    overflow-y: auto;
+    border-right: 1px solid var(--saldo-line);
+    background: var(--saldo-surface);
+  }
+  .saldo-rail > a:first-child { align-self: flex-start; margin-inline-start: 0.55rem; }
+  .saldo-rail-links { display: grid; gap: 0.25rem; }
+  .saldo-rail-links .saldo-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.7rem;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  .saldo-rail-links .saldo-nav-link:hover,
+  .saldo-rail-links .saldo-nav-link[aria-current="page"] { background: var(--saldo-wash); }
+  .saldo-rail-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    margin-top: auto;
+    border-radius: 0.8rem;
+    background: var(--saldo-forest);
+    color: var(--saldo-surface);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .saldo-app-body { padding-inline-start: var(--saldo-rail-width); }
+  .saldo-topbar { justify-content: flex-end; border-bottom: 1px solid var(--saldo-line); background: var(--saldo-surface); }
+  .saldo-topbar-brand, .saldo-dock { display: none; }
+  .saldo-main { padding-block: 1.75rem 3rem; }
+}
