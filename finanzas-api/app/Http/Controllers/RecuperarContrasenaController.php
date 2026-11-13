@@ -17,7 +17,8 @@ class RecuperarContrasenaController extends Controller
     public function solicitar(Request $request): JsonResponse
     {
         $datos = $request->validate(['email' => ['required', 'email', 'max:255']]);
-        if (config('mail.default') === 'log') {
+        $mailer = config('mail.default');
+        if ($mailer === 'log' || ($mailer === 'brevo' && blank(config('mail.mailers.brevo.key')))) {
             return response()->json(['message' => 'El envío de correo aún no está configurado en Saldo.'], 503);
         }
         try {
