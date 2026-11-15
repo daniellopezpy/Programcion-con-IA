@@ -3,9 +3,11 @@ import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChartNoAxesColumnIncreasing
 import { Link, NavLink, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { BrandLogo } from '@/components/BrandLogo'
 import { BrandIntro } from '@/components/BrandIntro'
+import { PaymentNotifications } from '@/components/PaymentNotifications'
 import { SaldoTour } from '@/components/SaldoTour'
 import { useAuth } from '@/context/useAuth'
 import { DashboardPeriodProvider, useDashboardPeriod } from '@/context/dashboard-period'
+import { RecurringPaymentsProvider } from '@/context/recurring-payments'
 import './app-shell.css'
 
 const home = { to: '/', label: 'Inicio', icon: House, end: true }
@@ -31,7 +33,14 @@ function NavigationLink({ item, query }) {
 
 export function AppLayout() {
   const { user } = useAuth()
-  return <DashboardPeriodProvider><AppShell key={user?.id} /></DashboardPeriodProvider>
+  // Keyed by account: a different user starts with empty, loading payment data.
+  return (
+    <DashboardPeriodProvider>
+      <RecurringPaymentsProvider key={user?.id} userId={user?.id}>
+        <AppShell />
+      </RecurringPaymentsProvider>
+    </DashboardPeriodProvider>
+  )
 }
 
 function AppShell() {
@@ -92,6 +101,7 @@ function AppShell() {
                 <CalendarClock size={20} aria-hidden="true" />
                 <span>Próximos pagos</span>
               </Link>
+              <PaymentNotifications query={query} />
               <Link to={`/perfil?${query}`} className="saldo-topbar-profile" aria-label="Abrir mi perfil">
                 <span className="saldo-topbar-name">{user?.name}</span>
                 <span className="saldo-avatar" aria-hidden="true">{initials}</span>

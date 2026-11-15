@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useDashboardPeriod } from '@/context/dashboard-period'
 import { useAuth } from '@/context/useAuth'
 import { moneyAmount } from '@/lib/money-input'
-import { dateInGuatemala } from '@/lib/period-recap'
-import { nextRecurringPayment, recurringDatesForMonth } from '@/lib/recurring-payments'
+import { nextRecurringPayment, scheduledDatesForMonth } from '@/lib/recurring-payments'
 import { useRecurringPayments } from '@/lib/use-recurring-payments'
 import { api } from '@/lib/api'
 import { formatCurrency, formatDate, monthName, newOperationId } from '@/lib/utils'
@@ -186,7 +185,7 @@ function PaymentCard({ payment, nextDate, dates, onEdit }) {
 export function RecurringPaymentsPage() {
   const { user } = useAuth()
   const { query } = useDashboardPeriod()
-  const records = useRecurringPayments(user.id)
+  const records = useRecurringPayments()
   const [busy, setBusy] = useState(false)
   const [editing, setEditing] = useState(null)
   const [notice, setNotice] = useState('')
@@ -195,15 +194,15 @@ export function RecurringPaymentsPage() {
   const removedTrigger = useRef(false)
   const pending = useRef(false)
   const draftId = useRef(null)
-  const today = dateInGuatemala()
+  const today = records.today
   const [year, month] = today.split('-').map(Number)
   const [selectedMonth, setSelectedMonth] = useState(month)
   const [selectedYear, setSelectedYear] = useState(year)
   const payments = records.payments
     .map((payment) => ({
       payment,
-      nextDate: nextRecurringPayment(payment.days, today, payment.paidDates),
-      dates: recurringDatesForMonth(payment.days, selectedYear, selectedMonth),
+      nextDate: nextRecurringPayment(payment, today),
+      dates: scheduledDatesForMonth(payment, selectedYear, selectedMonth),
     }))
     .sort((a, b) => a.nextDate.localeCompare(b.nextDate) || a.payment.name.localeCompare(b.payment.name))
 

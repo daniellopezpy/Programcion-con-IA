@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useDashboardPeriod } from '@/context/dashboard-period'
 import { useAuth } from '@/context/useAuth'
 import { api } from '@/lib/api'
+import { categoryLabel } from '@/lib/category-label'
 import { moneyAmount } from '@/lib/money-input'
 import { formatCurrency, formatDate, localDateString } from '@/lib/utils'
 import './home-money-shortcuts.css'
@@ -35,6 +36,8 @@ export function QuickExpenseShortcut({ onSaved }) {
   const id = useId()
   const dialogRef = useRef(null)
   const pending = useRef(false)
+  const requestRef = useRef(null)
+  const { user } = useAuth()
   const { query } = useDashboardPeriod()
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(localDateString)
@@ -43,16 +46,37 @@ export function QuickExpenseShortcut({ onSaved }) {
   const [amountError, setAmountError] = useState('')
   const [saveError, setSaveError] = useState('')
 
-  async function loadCategory() {
+  async function loadPreference() {
+    requestRef.current?.abort()
+    const controller = new AbortController()
+    requestRef.current = controller
     setCatalog({ status: 'loading' })
     try {
-      const categories = await api.get('/categorias?tipo=egreso')
-      const category = categories.find(({ nombre, tipo, user_id }) => nombre === 'Otro Egreso' && tipo === 'egreso' && user_id === null)
-      setCatalog(category ? { status: 'ready', id: category.id } : { status: 'missing' })
-    } catch {
+      const data = await api.get('/preferencias/gasto-hormiga', {
+        accountId: user?.id,
+        signal: controller.signal,
+      })
+      if (controller.signal.aborted) return
+      if (data?.categoria_efectiva?.id) {
+        setCatalog({
+          status: 'ready',
+          id: data.categoria_efectiva.id,
+          nombre: categoryLabel(data.categoria_efectiva.nombre),
+        })
+      } else {
+        setCatalog({ status: 'missing' })
+      }
+    } catch (error) {
+      if (controller.signal.aborted || error.name === 'AbortError') return
       setCatalog({ status: 'error' })
     }
   }
+
+  useEffect(() => {
+    return () => {
+      requestRef.current?.abort()
+    }
+  }, [])
 
   function open() {
     setAmount('')
@@ -61,12 +85,12 @@ export function QuickExpenseShortcut({ onSaved }) {
     setSaveError('')
     dialogRef.current.showModal()
     dialogRef.current.querySelector('input')?.focus()
-    if (!catalog || catalog.status === 'error' || catalog.status === 'missing') loadCategory()
+    loadPreference()
   }
 
   async function save(event) {
     event.preventDefault()
-    if (pending.current || catalog?.status !== 'ready') return
+    if (pending.current || catalog?.status !== 'ready' || !catalog?.id) return
 
     const monto = moneyAmount(amount)
     if (monto === null) {
@@ -84,7 +108,7 @@ export function QuickExpenseShortcut({ onSaved }) {
         fecha: date,
         descripcion: 'Gasto hormiga',
         categoria_id: catalog.id,
-      })
+      }, { accountId: user?.id })
     } catch (error) {
       if (error.errors?.monto?.[0]) setAmountError(error.errors.monto[0])
       else if (error.errors?.categoria_id) setCatalog({ status: 'missing' })
@@ -128,17 +152,19 @@ export function QuickExpenseShortcut({ onSaved }) {
             required
             disabled={busy}
           />
-          <p className="saldo-home-money-note">Se guarda como <strong>Gasto hormiga</strong> en <strong>Otro egreso</strong> con fecha de hoy, {formatDate(date)}.</p>
+          {catalogStatus === 'ready' && (
+            <p className="saldo-home-money-note">Se guardará en <strong>{catalog.nombre}</strong> con fecha de hoy, {formatDate(date)}.</p>
+          )}
           {catalogStatus === 'loading' && <p role="status" className="saldo-home-money-note">Buscando la categoría…</p>}
           {(catalogStatus === 'error' || catalogStatus === 'missing') && (
             <div className="saldo-home-money-retry">
-              <p role="alert">{catalogStatus === 'missing' ? 'No encontramos la categoría Otro egreso.' : 'No pudimos consultar las categorías.'}</p>
-              <Button variant="secondary" size="sm" onClick={loadCategory}>Volver a intentar</Button>
+              <p role="alert">{catalogStatus === 'missing' ? 'No encontramos la categoría para el gasto hormiga.' : 'No pudimos consultar las categorías.'}</p>
+              <Button variant="secondary" size="sm" onClick={loadPreference}>Volver a intentar</Button>
               <Link to={`/egresos/nuevo?${query}`} onClick={() => dialogRef.current.close()}>Abrir el formulario de egresos</Link>
             </div>
           )}
           {saveError && <p role="alert" className="saldo-home-money-error">{saveError}</p>}
-          <Button type="submit" disabled={busy || catalogStatus !== 'ready'}>{busy ? 'Guardando…' : 'Guardar gasto'}</Button>
+          <Button type="submit" disabled={busy || catalogStatus !== 'ready' || !catalog?.id}>{busy ? 'Guardando…' : 'Guardar gasto'}</Button>
         </form>
       </ShortcutDialog>
     </>

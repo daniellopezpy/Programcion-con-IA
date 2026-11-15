@@ -1,0 +1,100 @@
+.saldo-notifications-bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  border-radius: 0.7rem;
+  color: var(--saldo-forest);
+}
+.saldo-notifications-bell:hover { background: var(--saldo-wash); }
+.saldo-notifications-count {
+  position: absolute;
+  inset-block-start: 0.2rem;
+  inset-inline-end: 0.1rem;
+  min-inline-size: 1.15rem;
+  padding: 0.05rem 0.28rem;
+  border: 2px solid var(--saldo-surface);
+  border-radius: 999px;
+  background: #b5402c;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.saldo-notifications-dialog {
+  width: min(26rem, calc(100% - 1.5rem));
+  max-height: calc(100dvh - 1.5rem);
+  margin: auto;
+  padding: 1.1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--saldo-line);
+  border-radius: 1rem;
+  background: var(--saldo-surface);
+  color: var(--saldo-ink);
+}
+.saldo-notifications-dialog::backdrop { background: rgb(15 38 29 / 50%); }
+.saldo-notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-block-end: 0.6rem;
+}
+.saldo-notifications-header h2 { font-size: 1.2rem; font-weight: 700; }
+.saldo-notifications-close {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: 0.65rem;
+  color: var(--saldo-forest);
+}
+.saldo-notifications-close:hover, .saldo-notifications-retry:hover, .saldo-notifications-link:hover { background: var(--saldo-wash); }
+.saldo-notifications-subtitle { margin-block-end: 0.4rem; color: var(--saldo-muted); font-size: 0.8125rem; font-weight: 650; }
+.saldo-notifications-note { color: var(--saldo-muted); font-size: 0.9rem; }
+.saldo-notifications-error { display: grid; justify-items: start; gap: 0.5rem; }
+.saldo-notifications-retry {
+  min-block-size: 2.75rem;
+  padding-inline: 0.9rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: 0.65rem;
+  color: var(--saldo-forest);
+  font-weight: 600;
+}
+.saldo-notifications-retry:disabled { opacity: 0.6; }
+.saldo-notifications-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.saldo-notifications-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 0.7rem;
+  border-block-end: 1px solid var(--saldo-line);
+}
+.saldo-notifications-item-main { display: grid; gap: 0.1rem; min-inline-size: 0; }
+.saldo-notifications-item-main strong { font-weight: 650; overflow-wrap: anywhere; }
+.saldo-notifications-item-main time { color: #9a3626; font-size: 0.8125rem; font-weight: 600; }
+.saldo-notifications-amount { flex-shrink: 0; font-weight: 650; font-variant-numeric: tabular-nums; text-align: end; }
+.saldo-notifications-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 2.75rem;
+  margin-block-start: 0.9rem;
+  border: 1px solid var(--saldo-line);
+  border-radius: 0.65rem;
+  color: var(--saldo-forest);
+  font-weight: 600;
+}
+
+@media (max-width: 22rem) {
+  .saldo-notifications-dialog { padding: 0.9rem; }
+  .saldo-notifications-list li { flex-wrap: wrap; gap: 0.25rem 0.75rem; }
+  .saldo-notifications-amount { text-align: start; }
+}

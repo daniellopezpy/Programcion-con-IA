@@ -10,6 +10,7 @@ use App\Http\Controllers\EgresoController;
 use App\Http\Controllers\EgresoRecurrenteController;
 use App\Http\Controllers\IngresoCobroController;
 use App\Http\Controllers\IngresoController;
+use App\Http\Controllers\PreferenciaGastoHormigaController;
 use App\Http\Controllers\PresupuestoPagoController;
 use App\Http\Controllers\RecuperarContrasenaController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,8 @@ Route::post('/restablecer-contrasena', [RecuperarContrasenaController::class, 'r
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/efectivo', [DatosSincronizadosController::class, 'efectivo']);
     Route::put('/efectivo', [DatosSincronizadosController::class, 'guardarEfectivo']);
+    Route::get('/preferencias/gasto-hormiga', [PreferenciaGastoHormigaController::class, 'show']);
+    Route::put('/preferencias/gasto-hormiga', [PreferenciaGastoHormigaController::class, 'update']);
     Route::get('/pagos-programados', [DatosSincronizadosController::class, 'pagos']);
     Route::post('/pagos-programados/importar', [DatosSincronizadosController::class, 'importarPagos']);
     Route::put('/pagos-programados/{clave}', [DatosSincronizadosController::class, 'guardarPago'])->where('clave', '[a-zA-Z0-9-]{1,80}');

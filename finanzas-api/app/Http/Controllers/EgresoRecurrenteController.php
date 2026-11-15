@@ -22,10 +22,8 @@ class EgresoRecurrenteController extends Controller
             $usuario = User::query()->lockForUpdate()->findOrFail($request->user()->id);
             $pago = $usuario->pagosProgramados()->withTrashed()->where('clave', $datos['pago'])->lockForUpdate()->first();
             abort_if($pago?->trashed(), 404, 'Este pago se eliminó en otro dispositivo.');
-            if ($pago && !in_array($datos['vencimiento'], $pago->fechas_pagadas, true)) {
-                $fecha = CarbonImmutable::parse($datos['vencimiento']);
-                $dias = array_map(fn (int $dia) => min($dia, $fecha->daysInMonth), $pago->configuracion['days']);
-                if (!in_array($fecha->day, $dias, true)) {
+            if ($pago && !in_array($datos['vencimiento'], $pago->fechas_pagadas ?? [], true)) {
+                if (!$pago->esVencimientoValido($datos['vencimiento'])) {
                     throw ValidationException::withMessages(['vencimiento' => 'Este vencimiento cambió. Revisa el calendario.']);
                 }
             }

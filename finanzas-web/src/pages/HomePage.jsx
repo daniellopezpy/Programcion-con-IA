@@ -9,12 +9,12 @@ import { HomePeriodRecap } from '@/components/HomePeriodRecap'
 import { HomeSavingsProgress } from '@/components/HomeSavingsProgress'
 import { HomeTransactionSheet } from '@/components/HomeTransactionSheet'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/context/useAuth'
+import { useGuatemalaToday } from '@/context/recurring-payments'
 import { FormField, FormMessage } from '@/components/FormField'
 import { useDashboardPeriod } from '@/context/dashboard-period'
 import { api } from '@/lib/api'
 import { categoryLabel } from '@/lib/category-label'
-import { dateInGuatemala } from '@/lib/period-recap'
+import { upcomingPaymentsPath } from '@/lib/upcoming-payments'
 import { tomorrowDate, upcomingRecurringPayments } from '@/lib/recurring-payments'
 import { useRecurringPayments } from '@/lib/use-recurring-payments'
 import { formatCurrency, formatDate, monthName } from '@/lib/utils'
@@ -28,6 +28,26 @@ const movementFilters = [
 
 function searchText(value = '') {
   return value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim()
+}
+
+function getThisMonthRange(today) {
+  if (!today) return null
+  const [year, month] = today.split('-')
+  return {
+    desde: `${year}-${month}-01`,
+    hasta: today,
+  }
+}
+
+function getLast7DaysRange(today) {
+  if (!today) return null
+  const [year, month, day] = today.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  date.setUTCDate(date.getUTCDate() - 6)
+  return {
+    desde: date.toISOString().slice(0, 10),
+    hasta: today,
+  }
 }
 
 function matchesSearch({ item, type }, terms, movementType) {
@@ -65,13 +85,13 @@ function sortMovements(items) {
 }
 
 function PaymentReminder({ query }) {
-  const { user } = useAuth()
-  const { payments, error } = useRecurringPayments(user.id)
-  const today = dateInGuatemala()
+  const { payments, error } = useRecurringPayments()
+  const upcomingPath = upcomingPaymentsPath(query)
+  const today = useGuatemalaToday()
   const due = upcomingRecurringPayments(payments, today, 1)[0]
   const urgent = !error && due && due.date <= tomorrowDate(today)
   return (
-    <Link className="saldo-payment-reminder" to={`/analisis?${query}&vista=egresos#saldo-upcoming-title`} state={{ useCurrentAnalyticsPeriod: true }}>
+    <Link className="saldo-payment-reminder" to={upcomingPath} state={{ useCurrentAnalyticsPeriod: true }}>
       <CalendarClock size={20} aria-hidden="true" />
       <span><strong>Próximos pagos</strong>{urgent && <time dateTime={due.date}>{due.payment.name} vence {due.date === today ? 'hoy' : 'mañana'}</time>}</span>
       <ChevronRight size={18} aria-hidden="true" />
@@ -93,9 +113,13 @@ function HomeActivity({ activity, period, movementRevision, onRetry, onMutation 
   const heading = useRef(null)
   const searchInput = useRef(null)
   const datesToggle = useRef(null)
-  const today = dateInGuatemala()
+  const today = useGuatemalaToday()
+  const thisMonthRange = getThisMonthRange(today)
+  const last7DaysRange = getLast7DaysRange(today)
   const activeRange = expanded ? dateRange : null
-  const rangeQuery = activeRange ? new URLSearchParams(activeRange).toString() : ''
+  const rangeQuery = activeRange
+    ? new URLSearchParams({ desde: activeRange.desde, hasta: activeRange.hasta }).toString()
+    : ''
   const rangeKey = `${rangeQuery}:${movementRevision}`
   const result = activeRange ? (rangeResult?.key === rangeKey ? rangeResult : null) : activity
   const items = result?.items ?? []
@@ -181,6 +205,18 @@ function HomeActivity({ activity, period, movementRevision, onRetry, onMutation 
     setDateError('')
   }
 
+  function cancelDates() {
+    setDateError('')
+    setDatesOpen(false)
+    datesToggle.current?.focus({ preventScroll: true })
+  }
+
+  function applyDatePreset(preset, range) {
+    if (!range) return
+    setDateError('')
+    setDateRange({ ...range, preset })
+  }
+
   return (
     <section className="saldo-recent" aria-labelledby="saldo-recent-title">
       <header className="saldo-recent-header">
@@ -215,15 +251,66 @@ function HomeActivity({ activity, period, movementRevision, onRetry, onMutation 
                   <button key={value} type="button" aria-pressed={movementType === value} onClick={() => setMovementType(value)}>{label}</button>
                 ))}
               </div>
-              <button type="button" ref={datesToggle} className="saldo-transaction-dates-toggle" aria-expanded={datesOpen} aria-controls="saldo-transaction-date-form"
-                onClick={() => setDatesOpen((open) => !open)}>
-                <CalendarDays size={16} aria-hidden="true" /> Fechas <ChevronDown size={14} aria-hidden="true" />
-              </button>
+              <div className="saldo-transaction-dates-group" role="group" aria-label="Filtrar por fechas">
+                <button
+                  type="button"
+                  className="saldo-transaction-date-shortcut"
+                  aria-pressed={activeRange?.preset === 'month'}
+                  onClick={() => applyDatePreset('month', thisMonthRange)}
+                >
+                  Este mes
+                </button>
+                <button
+                  type="button"
+                  className="saldo-transaction-date-shortcut"
+                  aria-pressed={activeRange?.preset === 'week'}
+                  onClick={() => applyDatePreset('week', last7DaysRange)}
+                >
+                  Últimos 7 días
+                </button>
+                <button
+                  type="button"
+                  ref={datesToggle}
+                  className="saldo-transaction-dates-toggle"
+                  aria-expanded={datesOpen}
+                  aria-controls="saldo-transaction-date-form"
+                  onClick={() => setDatesOpen((open) => !open)}
+                >
+                  <CalendarDays size={16} aria-hidden="true" /> Elegir fechas <ChevronDown size={14} aria-hidden="true" />
+                </button>
+              </div>
             </div>
-            <form id="saldo-transaction-date-form" className="saldo-transaction-dates" hidden={!datesOpen}
-              onSubmit={applyDates} onReset={clearDates} onChange={() => setDateError('')}>
-              <FormField id="saldo-transaction-from" name="desde" className="activity-form-field" label="Desde" type="date" />
-              <FormField id="saldo-transaction-to" name="hasta" className="activity-form-field" label="Hasta" type="date" />
+            <form
+              id="saldo-transaction-date-form"
+              key={datesOpen ? `${dateRange?.desde ?? ''}_${dateRange?.hasta ?? ''}` : 'closed'}
+              className="saldo-transaction-dates"
+              hidden={!datesOpen}
+              onSubmit={applyDates}
+              onReset={clearDates}
+              onChange={() => setDateError('')}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  event.preventDefault()
+                  cancelDates()
+                }
+              }}
+            >
+              <FormField
+                id="saldo-transaction-from"
+                name="desde"
+                className="activity-form-field"
+                label="Desde"
+                type="date"
+                defaultValue={dateRange?.desde ?? ''}
+              />
+              <FormField
+                id="saldo-transaction-to"
+                name="hasta"
+                className="activity-form-field"
+                label="Hasta"
+                type="date"
+                defaultValue={dateRange?.hasta ?? ''}
+              />
               <div className="saldo-transaction-filter-actions">
                 <Button type="submit" size="sm" variant="secondary">Aplicar fechas</Button>
                 <Button type="reset" size="sm" variant="ghost">Quitar fechas</Button>

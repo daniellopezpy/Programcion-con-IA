@@ -142,6 +142,14 @@
 }
 .saldo-profile-account p { color: var(--saldo-muted); font-size: 0.88rem; }
 
+@media (max-width: 22.5rem) {
+  .saldo-topbar { gap: 0.5rem; padding-inline: 0.75rem; }
+  .saldo-topbar-actions { gap: 0.1rem; }
+  /* Icon-only shortcuts; each link keeps its aria-label and 44 px target. */
+  .saldo-topbar-shortcut { padding-inline: 0; }
+  .saldo-topbar-shortcut > span { display: none; }
+}
+
 @media (min-width: 48rem) {
   .saldo-topbar { padding-inline: 2rem; }
   .saldo-topbar-name { display: inline; font-weight: 600; font-size: 0.9rem; }

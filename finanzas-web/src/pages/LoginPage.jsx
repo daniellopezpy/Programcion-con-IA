@@ -24,7 +24,11 @@ export function LoginPage() {
     setError('')
     try {
       await login(values)
-      navigate(location.state?.from?.pathname || '/', { replace: true })
+      const from = location.state?.from
+      const destination = from?.pathname
+        ? { pathname: from.pathname, search: from.search, hash: from.hash }
+        : '/'
+      navigate(destination, { replace: true })
     } catch (requestError) {
       setError(requestError.message)
     } finally {

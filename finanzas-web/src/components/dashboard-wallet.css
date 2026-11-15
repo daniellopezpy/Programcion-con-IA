@@ -443,7 +443,11 @@
   gap: 0.4rem 0.75rem;
 }
 .saldo-transaction-types { display: flex; flex-wrap: wrap; gap: 0.2rem; }
-.saldo-transaction-types button, .saldo-transaction-dates-toggle, .saldo-transaction-filter-summary button {
+.saldo-transaction-dates-group { display: flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; }
+.saldo-transaction-types button,
+.saldo-transaction-date-shortcut,
+.saldo-transaction-dates-toggle,
+.saldo-transaction-filter-summary button {
   min-height: 2.75rem;
   padding-inline: 0.65rem;
   border-radius: 0.65rem;
@@ -451,7 +455,19 @@
   font-size: 0.875rem;
   font-weight: 650;
 }
-.saldo-transaction-types button[aria-pressed="true"] { background: var(--saldo-forest); color: var(--saldo-surface); }
+.saldo-transaction-types button[aria-pressed="true"],
+.saldo-transaction-date-shortcut[aria-pressed="true"] {
+  background: var(--saldo-forest);
+  color: var(--saldo-surface);
+  border-color: var(--saldo-forest);
+}
+.saldo-transaction-date-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--saldo-line);
+  background: var(--saldo-surface);
+}
 .saldo-transaction-dates-toggle {
   display: inline-flex;
   align-items: center;
@@ -462,7 +478,9 @@
 .saldo-transaction-dates-toggle[aria-expanded="true"] { background: var(--saldo-wash); }
 .saldo-transaction-dates-toggle[aria-expanded="true"] svg:last-child { transform: rotate(180deg); }
 .saldo-transaction-searchbox button:hover, .saldo-transaction-dates-toggle:hover,
-.saldo-transaction-types button[aria-pressed="false"]:hover, .saldo-transaction-filter-summary button:hover { background: var(--saldo-wash); }
+.saldo-transaction-types button[aria-pressed="false"]:hover,
+.saldo-transaction-date-shortcut[aria-pressed="false"]:hover,
+.saldo-transaction-filter-summary button:hover { background: var(--saldo-wash); }
 .saldo-transaction-dates {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -482,10 +500,24 @@
 .saldo-transaction-filter-actions button { min-block-size: 2.75rem; }
 .saldo-transaction-filter-summary { color: var(--saldo-muted); font-size: 0.875rem; }
 @media (prefers-reduced-motion: no-preference) {
-  .saldo-transaction-types button, .saldo-transaction-dates-toggle { transition: background-color 150ms ease, color 150ms ease; }
+  .saldo-transaction-types button,
+  .saldo-transaction-date-shortcut,
+  .saldo-transaction-dates-toggle {
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
 }
 @media (max-width: 23rem) {
   .saldo-transaction-dates { grid-template-columns: minmax(0, 1fr); }
+  .saldo-transaction-dates-group {
+    inline-size: 100%;
+    gap: 0.35rem;
+  }
+  .saldo-transaction-dates-group > button {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding-inline: 0.45rem;
+    font-size: 0.8125rem;
+  }
 }
 .saldo-recent-day + .saldo-recent-day { border-block-start: 1px solid var(--saldo-line); }
 .saldo-recent-day h3 {

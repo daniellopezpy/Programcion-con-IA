@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { CalendarCheck, ChevronRight, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { CalendarCheck, Check, ChevronRight, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { DownloadMovements } from '@/components/DownloadMovements'
 import { useAuth } from '@/context/useAuth'
@@ -10,12 +10,60 @@ import { getSaldoPreferences } from '@/lib/saldo-preferences'
 import { formatCurrency, monthName } from '@/lib/utils'
 import './home-checkins.css'
 
-function hasDismissed(key) {
+function readStoredFlag(key) {
   try {
     return localStorage.getItem(key) === 'true'
   } catch {
     return false
   }
+}
+
+function PositiveMonthStamp({ storageKey }) {
+  const stamp = useRef(null)
+  const [flashing, setFlashing] = useState(false)
+
+  useEffect(() => {
+    if (!stamp.current || typeof IntersectionObserver === 'undefined' || readStoredFlag(storageKey)) return
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (motion.matches) return
+
+    let watching = true
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!watching || motion.matches || !entry.isIntersecting || entry.intersectionRatio < 0.5) return
+      watching = false
+      observer.disconnect()
+      try {
+        if (localStorage.getItem(storageKey) === 'true') return
+        localStorage.setItem(storageKey, 'true')
+      } catch {
+        return
+      }
+      setFlashing(true)
+    }, { threshold: 0.5, rootMargin: '0px 0px -60px 0px' })
+
+    function handleMotionChange(event) {
+      if (!event.matches) return
+      watching = false
+      observer.disconnect()
+      setFlashing(false)
+    }
+
+    observer.observe(stamp.current)
+    motion.addEventListener('change', handleMotionChange)
+    return () => {
+      watching = false
+      observer.disconnect()
+      motion.removeEventListener('change', handleMotionChange)
+    }
+  }, [storageKey])
+
+  return (
+    <span ref={stamp} className="home-recap-stamp" data-flash={flashing || undefined}
+      onAnimationEnd={() => setFlashing(false)}>
+      <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+      <span>Mes en positivo</span>
+    </span>
+  )
 }
 
 async function loadRecap(period, query) {
@@ -54,7 +102,7 @@ export function HomePeriodRecap({ movementRevision = 0 }) {
 
 function RecapCard({ period, storageKey, movementRevision }) {
   const { query: homeQuery } = useDashboardPeriod()
-  const [dismissed, setDismissed] = useState(() => hasDismissed(storageKey))
+  const [dismissed, setDismissed] = useState(() => readStoredFlag(storageKey))
   const [request, setRequest] = useState(null)
   const [revision, setRevision] = useState(0)
   const { kind, year, month: monthNumber, start, end } = period
@@ -87,13 +135,17 @@ function RecapCard({ period, storageKey, movementRevision }) {
   if (dismissed) return null
   const result = request?.revision === revision && request.movementRevision === movementRevision ? request : null
   const data = result?.data
+  const isPositiveMonth = kind === 'month' && Number(data?.balance) > 0
 
   return (
     <section className="home-checkin home-recap" aria-labelledby="home-recap-title">
       <header className="home-checkin-header">
         <span className="home-checkin-icon"><CalendarCheck size={20} aria-hidden="true" /></span>
         <div>
-          <h2 id="home-recap-title">{heading}</h2>
+          <div className="home-recap-title-row">
+            <h2 id="home-recap-title">{heading}</h2>
+            {isPositiveMonth && <PositiveMonthStamp storageKey={`${storageKey}:positive`} />}
+          </div>
           <p>{dateLabel}</p>
         </div>
         <button className="home-checkin-dismiss" type="button" aria-label="Ocultar este cierre" onClick={() => {

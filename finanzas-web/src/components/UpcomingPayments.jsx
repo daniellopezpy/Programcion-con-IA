@@ -1,28 +1,23 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { CalendarClock, Check, ChevronRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { MoneyField } from '@/components/MoneyField'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { moneyAmount } from '@/lib/money-input'
-import { dateInGuatemala } from '@/lib/period-recap'
-import { tomorrowDate, upcomingRecurringPayments } from '@/lib/recurring-payments'
+import { overdueRecurringPayments, tomorrowDate, upcomingRecurringPayments } from '@/lib/recurring-payments'
+import { overduePaymentsAnchor, recurringAmountLabel, upcomingPaymentsAnchor } from '@/lib/upcoming-payments'
 import { useRecurringPayments } from '@/lib/use-recurring-payments'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import './home-transaction-sheet.css'
-
-function paymentAmount(payment) {
-  const amount = moneyAmount(payment.amount)
-  return amount ? formatCurrency(amount) : 'Monto por definir'
-}
 
 function expensePath({ payment, date }) {
   return `/egresos/recurrentes/${encodeURIComponent(payment.id)}/${date}`
 }
 
 export function UpcomingPayments({ userId, query, onExpenseChange }) {
-  const { payments, loading, error, refresh } = useRecurringPayments(userId)
-  const [today, setToday] = useState(dateInGuatemala)
+  const { payments, loading, error, refresh, today } = useRecurringPayments()
+  const { hash, key: locationKey } = useLocation()
   const [selected, setSelected] = useState(null)
   const [lastMarked, setLastMarked] = useState(null)
   const [notice, setNotice] = useState('')
@@ -33,23 +28,41 @@ export function UpcomingPayments({ userId, query, onExpenseChange }) {
   const pending = useRef(false)
   const dialog = useRef(null)
   const heading = useRef(null)
+  const overdueHeading = useRef(null)
   const trigger = useRef(null)
+  const navigatedTargetRef = useRef(null)
+  const overdue = overdueRecurringPayments(payments, today)
   const upcoming = upcomingRecurringPayments(payments, today)
   const tomorrow = tomorrowDate(today)
 
-  useEffect(() => {
-    const updateDate = () => setToday(dateInGuatemala())
-    const clock = window.setInterval(updateDate, 60_000)
-    window.addEventListener('focus', updateDate)
-    return () => {
-      window.clearInterval(clock)
-      window.removeEventListener('focus', updateDate)
-    }
-  }, [])
+  const isOverdueTarget = hash === `#${overduePaymentsAnchor}`
+  const isUpcomingTarget = hash === `#${upcomingPaymentsAnchor}`
+  const isTargetNav = isOverdueTarget || isUpcomingTarget
+  const showOverdueSection = overdue.length > 0 || (isOverdueTarget && !loading && !error)
 
   useLayoutEffect(() => {
     if (selected && !dialog.current.open) dialog.current.showModal()
   }, [selected])
+
+  useEffect(() => {
+    if (!isTargetNav || loading) return
+
+    const targetId = hash.slice(1)
+    const navToken = `${locationKey}:${targetId}`
+
+    if (navigatedTargetRef.current === navToken) return
+
+    const frame = requestAnimationFrame(() => {
+      const el = document.getElementById(targetId)
+      if (el) {
+        navigatedTargetRef.current = navToken
+        el.focus({ preventScroll: true })
+        el.scrollIntoView({ block: 'start' })
+      }
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [hash, locationKey, isTargetNav, loading, showOverdueSection, upcoming.length])
 
   function openPayment(occurrence, event) {
     if (pending.current) return
@@ -61,9 +74,11 @@ export function UpcomingPayments({ userId, query, onExpenseChange }) {
   }
 
   function closePayment() {
+    const wasOverdue = selected?.date && selected.date < today
     setSelected(null)
     setSaveError('')
-    const focusTarget = trigger.current?.isConnected ? trigger.current : heading.current
+    const defaultHeading = wasOverdue && overdueHeading.current ? overdueHeading.current : heading.current
+    const focusTarget = trigger.current?.isConnected ? trigger.current : defaultHeading
     focusTarget?.focus({ preventScroll: true })
     trigger.current = null
   }
@@ -99,6 +114,7 @@ export function UpcomingPayments({ userId, query, onExpenseChange }) {
 
   async function undoPaid() {
     if (pending.current || !lastMarked) return
+    const wasOverdue = lastMarked.date < today
     pending.current = true
     setBusy(true)
     setSaveError('')
@@ -108,7 +124,8 @@ export function UpcomingPayments({ userId, query, onExpenseChange }) {
       await refresh()
       setLastMarked(null)
       setNotice('Gasto eliminado y pago devuelto a pendientes.')
-      heading.current?.focus({ preventScroll: true })
+      const targetHeading = wasOverdue && overdueHeading.current ? overdueHeading.current : heading.current
+      targetHeading?.focus({ preventScroll: true })
     } catch (requestError) {
       setSaveError(requestError.errors?.egreso?.[0] || requestError.message)
     } finally {
@@ -118,14 +135,7 @@ export function UpcomingPayments({ userId, query, onExpenseChange }) {
   }
 
   return (
-    <section className="saldo-upcoming" aria-labelledby="saldo-upcoming-title">
-      <header className="saldo-upcoming-header">
-        <h2 id="saldo-upcoming-title" ref={heading} tabIndex={-1}><CalendarClock size={21} aria-hidden="true" /> Próximos pagos</h2>
-        <Link className="saldo-upcoming-link" to={`/pagos-recurrentes?${query}`}>
-          {upcoming.length > 0 || error ? 'Ver calendario' : 'Agregar un pago'}
-          <ChevronRight size={16} aria-hidden="true" />
-        </Link>
-      </header>
+    <section className="saldo-upcoming" aria-labelledby={showOverdueSection ? overduePaymentsAnchor : upcomingPaymentsAnchor}>
       <div className="saldo-upcoming-feedback">
         <p role="status">{notice}</p>
         {lastMarked && <button type="button" className="saldo-upcoming-undo" disabled={busy} onClick={undoPaid}>Deshacer</button>}
@@ -133,29 +143,74 @@ export function UpcomingPayments({ userId, query, onExpenseChange }) {
       {loading && <p className="saldo-upcoming-note" role="status">Consultando próximos pagos…</p>}
       {error && <div><p className="saldo-upcoming-note" role="status">{error}</p><Button size="sm" variant="secondary" onClick={refresh}>Reintentar</Button></div>}
       {!selected && saveError && <p className="saldo-upcoming-error" role="alert">{saveError}</p>}
-      {!loading && !error && upcoming.length === 0 && <p className="saldo-upcoming-note">Aquí verás las próximas fechas de tus suscripciones y cuentas.</p>}
-      {upcoming.length > 0 && (
-        <ol className="saldo-upcoming-list" role="list">
-          {upcoming.map((occurrence) => {
-            const { payment, date } = occurrence
-            const amount = paymentAmount(payment)
-            return (
-              <li key={`${payment.id}-${date}`}>
-                <button type="button" className="saldo-upcoming-row" aria-haspopup="dialog" disabled={busy} onClick={(event) => openPayment(occurrence, event)}>
-                  <span>
-                    <span className="saldo-upcoming-name">{payment.name}</span>
-                    <time dateTime={date} className={date <= tomorrow ? 'saldo-upcoming-due' : undefined}>
-                      {date === today ? 'Vence hoy' : date === tomorrow ? 'Vence mañana' : formatDate(date)}
-                    </time>
-                  </span>
-                  <span className="saldo-upcoming-row-amount">{amount}</span>
-                  <ChevronRight size={16} aria-hidden="true" />
-                </button>
-              </li>
-            )
-          })}
-        </ol>
+
+      {showOverdueSection && (
+        <div className="saldo-overdue-block">
+          <header className="saldo-upcoming-header">
+            <h2 id={overduePaymentsAnchor} ref={overdueHeading} tabIndex={-1}>
+              <CalendarClock size={21} aria-hidden="true" /> Pagos vencidos
+            </h2>
+          </header>
+          {overdue.length === 0 ? (
+            <p className="saldo-upcoming-note">No tienes pagos vencidos.</p>
+          ) : (
+            <ol className="saldo-upcoming-list" role="list">
+              {overdue.map((occurrence) => {
+                const { payment, date } = occurrence
+                const amount = recurringAmountLabel(payment)
+                return (
+                  <li key={`${payment.id}-${date}`}>
+                    <button type="button" className="saldo-upcoming-row" aria-haspopup="dialog" disabled={busy} onClick={(event) => openPayment(occurrence, event)}>
+                      <span>
+                        <span className="saldo-upcoming-name">{payment.name}</span>
+                        <time dateTime={date} className="saldo-upcoming-overdue-time">
+                          Venció el {formatDate(date)}
+                        </time>
+                      </span>
+                      <span className="saldo-upcoming-row-amount">{amount}</span>
+                      <ChevronRight size={16} aria-hidden="true" />
+                    </button>
+                  </li>
+                )
+              })}
+            </ol>
+          )}
+        </div>
       )}
+
+      <div className="saldo-upcoming-block">
+        <header className="saldo-upcoming-header">
+          <h2 id={upcomingPaymentsAnchor} ref={heading} tabIndex={-1}><CalendarClock size={21} aria-hidden="true" /> Próximos pagos</h2>
+          <Link className="saldo-upcoming-link" to={`/pagos-recurrentes?${query}`}>
+            {upcoming.length > 0 || error ? 'Ver calendario' : 'Agregar un pago'}
+            <ChevronRight size={16} aria-hidden="true" />
+          </Link>
+        </header>
+        {!loading && !error && upcoming.length === 0 && <p className="saldo-upcoming-note">Aquí verás las próximas fechas de tus suscripciones y cuentas.</p>}
+        {upcoming.length > 0 && (
+          <ol className="saldo-upcoming-list" role="list">
+            {upcoming.map((occurrence) => {
+              const { payment, date } = occurrence
+              const amount = recurringAmountLabel(payment)
+              return (
+                <li key={`${payment.id}-${date}`}>
+                  <button type="button" className="saldo-upcoming-row" aria-haspopup="dialog" disabled={busy} onClick={(event) => openPayment(occurrence, event)}>
+                    <span>
+                      <span className="saldo-upcoming-name">{payment.name}</span>
+                      <time dateTime={date} className={date <= tomorrow ? 'saldo-upcoming-due' : undefined}>
+                        {date === today ? 'Vence hoy' : date === tomorrow ? 'Vence mañana' : formatDate(date)}
+                      </time>
+                    </span>
+                    <span className="saldo-upcoming-row-amount">{amount}</span>
+                    <ChevronRight size={16} aria-hidden="true" />
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+        )}
+      </div>
+
       <dialog ref={dialog} className="saldo-transaction-sheet" aria-labelledby="saldo-upcoming-confirm-title" onClose={closePayment} onCancel={(event) => { if (pending.current) event.preventDefault() }}>
         {selected && (
           <form className="saldo-transaction-sheet-content saldo-upcoming-confirm" onSubmit={markPaid} aria-busy={busy}>

@@ -23,6 +23,24 @@ const blankValues = {
   notas: '',
 }
 
+function matchSuggestedCategory(description, categories) {
+  const normalized = (description || '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+  const matchesSalud = /\b(farmacia|farmacias)\b/.test(normalized)
+  const matchesTransporte = /\bgasolina\b/.test(normalized)
+
+  if (matchesSalud === matchesTransporte) return null
+
+  const targetName = matchesSalud ? 'salud' : 'transporte'
+  return (
+    categories.find(
+      (category) => category.user_id == null && category.nombre?.trim().toLowerCase() === targetName,
+    ) || null
+  )
+}
+
 export function ExpenseFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -44,11 +62,24 @@ export function ExpenseFormPage() {
   const [cardId, setCardId] = useState('')
   const { cards } = getSaldoPreferences(user.id)
 
+  const suggestedCategoryId = useMemo(() => {
+    if (isEditing || values.categoria_id) return ''
+    const match = matchSuggestedCategory(values.descripcion, categories)
+    return match ? String(match.id) : ''
+  }, [isEditing, values.categoria_id, values.descripcion, categories])
+
+  const effectiveCategoryId = values.categoria_id || suggestedCategoryId
+  const isSuggested = Boolean(!values.categoria_id && suggestedCategoryId)
+
   const selectedCategory = useMemo(
-    () => categories.find((category) => String(category.id) === values.categoria_id),
-    [categories, values.categoria_id],
+    () => categories.find((category) => String(category.id) === effectiveCategoryId),
+    [categories, effectiveCategoryId],
   )
   const subcategories = selectedCategory?.subcategorias || []
+  const validSubcategory = Boolean(
+    values.subcategoria_id &&
+    subcategories.some((sub) => String(sub.id) === values.subcategoria_id),
+  )
 
   useEffect(() => {
     let active = true
@@ -94,8 +125,29 @@ export function ExpenseFormPage() {
 
   function updateField(event) {
     const { name, value } = event.target
-    setValues((current) => ({ ...current, [name]: value, ...(name === 'categoria_id' ? { subcategoria_id: '' } : {}) }))
-    setErrors((current) => ({ ...current, [name]: undefined, ...(name === 'categoria_id' ? { subcategoria_id: undefined } : {}) }))
+    setValues((current) => {
+      const next = {
+        ...current,
+        [name]: value,
+        ...(name === 'categoria_id' ? { subcategoria_id: '' } : {}),
+      }
+      if (name === 'subcategoria_id' && value && !current.categoria_id && suggestedCategoryId) {
+        next.categoria_id = suggestedCategoryId
+      }
+      return next
+    })
+    const clearsCategoryError = Boolean(
+      name === 'descripcion' &&
+      !isEditing &&
+      !values.categoria_id &&
+      matchSuggestedCategory(value, categories),
+    )
+    setErrors((current) => ({
+      ...current,
+      [name]: undefined,
+      ...(name === 'categoria_id' ? { subcategoria_id: undefined } : {}),
+      ...(clearsCategoryError ? { categoria_id: undefined } : {}),
+    }))
     setMessage('')
   }
 
@@ -110,7 +162,7 @@ export function ExpenseFormPage() {
       return
     }
 
-    if (!values.categoria_id) {
+    if (!effectiveCategoryId) {
       setErrors((current) => ({ ...current, categoria_id: 'Elige una categoría para tu egreso.' }))
       event.currentTarget.elements.namedItem('categoria_id')?.focus()
       return
@@ -128,8 +180,8 @@ export function ExpenseFormPage() {
     const payload = {
       fecha: values.fecha,
       descripcion: values.descripcion,
-      categoria_id: Number(values.categoria_id),
-      subcategoria_id: values.subcategoria_id ? Number(values.subcategoria_id) : null,
+      categoria_id: Number(effectiveCategoryId),
+      subcategoria_id: validSubcategory ? Number(values.subcategoria_id) : null,
       monto,
       notas: values.notas || null,
     }
@@ -205,14 +257,21 @@ export function ExpenseFormPage() {
             error={errors.descripcion}
             required
           />
-          <MovementCategoryField
-            label="Categoría"
-            name="categoria_id"
-            value={values.categoria_id}
-            items={categories}
-            onChange={updateField}
-            error={errors.categoria_id}
-          />
+          <div className="grid gap-1">
+            <MovementCategoryField
+              label="Categoría"
+              name="categoria_id"
+              value={effectiveCategoryId}
+              items={categories}
+              onChange={updateField}
+              error={errors.categoria_id}
+            />
+            {isSuggested && (
+              <p className="text-xs text-[#596b60]" role="status">
+                Sugerida por la descripción
+              </p>
+            )}
+          </div>
           <label className="movement-card-option">
             <span className="movement-category-icon"><CreditCard size={18} aria-hidden="true" /></span>
             <span>
@@ -252,7 +311,7 @@ export function ExpenseFormPage() {
               <MovementCategoryField
                 label="Subcategoría"
                 name="subcategoria_id"
-                value={values.subcategoria_id}
+                value={validSubcategory ? values.subcategoria_id : ''}
                 items={subcategories}
                 onChange={updateField}
                 error={errors.subcategoria_id}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PagoProgramado;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -45,7 +46,36 @@ class DatosSincronizadosController extends Controller
             $usuario = User::query()->lockForUpdate()->findOrFail($request->user()->id);
             $pago = $usuario->pagosProgramados()->withTrashed()->firstOrNew(['clave' => $clave]);
             abort_if($pago->trashed(), 404, 'Este pago se eliminó en otro dispositivo.');
-            $pago->configuracion = $this->configuracion($datos);
+
+            $nuevaConfiguracion = $this->configuracion($datos);
+
+            if ($pago->exists) {
+                $diasAnteriores = $pago->configuracion['days'] ?? [];
+                $diasNuevos = $nuevaConfiguracion['days'];
+
+                if ($diasAnteriores !== $diasNuevos) {
+                    $hoy = CarbonImmutable::today('America/Guatemala')->toDateString();
+                    $historial = $pago->scheduleHistory();
+
+                    $ultimoIndice = count($historial) - 1;
+                    if ($ultimoIndice >= 0 && $historial[$ultimoIndice]['startsOn'] === $hoy) {
+                        $historial[$ultimoIndice]['days'] = $diasNuevos;
+                    } else {
+                        $historial[] = [
+                            'startsOn' => $hoy,
+                            'days' => $diasNuevos,
+                        ];
+                    }
+                    $nuevaConfiguracion['schedule_history'] = $historial;
+                } else {
+                    $historiaExistente = $pago->configuracion['schedule_history'] ?? $pago->configuracion['scheduleHistory'] ?? null;
+                    if ($historiaExistente !== null) {
+                        $nuevaConfiguracion['schedule_history'] = $historiaExistente;
+                    }
+                }
+            }
+
+            $pago->configuracion = $nuevaConfiguracion;
             $pago->fechas_pagadas ??= [];
             $pago->save();
 
@@ -107,7 +137,7 @@ class DatosSincronizadosController extends Controller
 
     private function configuracion(array $datos): array
     {
-        $configuracion = Arr::except($datos, ['id', 'paidDates']);
+        $configuracion = Arr::except($datos, ['id', 'paidDates', 'createdOn', 'scheduleHistory', 'schedule_history']);
         $dias = array_values(array_unique(array_map('intval', $datos['days'])));
         sort($dias);
         if (($datos['frequency'] === 'monthly' && count($dias) !== 1) ||

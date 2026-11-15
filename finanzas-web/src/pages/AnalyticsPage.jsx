@@ -5,10 +5,12 @@ import { AnnualEvolutionChart, CategoryExpensesChart } from '@/components/Dashbo
 import { DownloadMovements } from '@/components/DownloadMovements'
 import { UpcomingPayments } from '@/components/UpcomingPayments'
 import { useDashboardPeriod } from '@/context/dashboard-period'
+import { useGuatemalaToday } from '@/context/recurring-payments'
 import { useAuth } from '@/context/useAuth'
 import { api } from '@/lib/api'
-import { dateInGuatemala } from '@/lib/period-recap'
+import { categoryLabel } from '@/lib/category-label'
 import { formatCurrency, monthName } from '@/lib/utils'
+import { calculateExpenseChange, formatExplicitDateRange, getComparisonRanges } from './analytics-change'
 import './analytics-page.css'
 
 const views = [
@@ -49,8 +51,8 @@ function useAnalyticsRequest(path) {
 
   return {
     data: matchingResult?.data,
-    loading: !matchingResult,
-    error: matchingResult?.error,
+    loading: Boolean(path) && !matchingResult,
+    error: Boolean(path) && Boolean(matchingResult?.error),
     retry: () => setRevision((count) => count + 1),
   }
 }
@@ -92,14 +94,57 @@ function MonthlyAmount({ currentMonth, metric, periodLabel, loading }) {
   )
 }
 
+function ExpenseChangeCard({ change, ranges }) {
+  if (!change || !ranges) return null
+
+  const direction = change.diffCents > 0 ? 'más' : 'menos'
+  const categoryName = categoryLabel(change.name)
+  const differenceText = formatCurrency(change.absDiff / 100)
+  const headline = `Gastaste ${differenceText} ${direction} en ${categoryName}`
+  const currentPeriodLabel = formatExplicitDateRange(
+    ranges.current.startDay,
+    ranges.current.endDay,
+    ranges.current.month,
+    ranges.current.year,
+  )
+  const previousPeriodLabel = formatExplicitDateRange(
+    ranges.previous.startDay,
+    ranges.previous.endDay,
+    ranges.previous.month,
+    ranges.previous.year,
+  )
+
+  return (
+    <section className="saldo-analytics-change" aria-labelledby="saldo-what-changed-heading">
+      <div className="saldo-analytics-change-heading">
+        <h2 id="saldo-what-changed-heading">Qué cambió</h2>
+      </div>
+      <p className="saldo-analytics-change-highlight">
+        {headline}
+      </p>
+      <dl className="saldo-analytics-change-periods">
+        <div className="saldo-analytics-change-period">
+          <dt>{currentPeriodLabel}</dt>
+          <dd>{formatCurrency(change.currentCents / 100)}</dd>
+        </div>
+        <div className="saldo-analytics-change-period">
+          <dt>{previousPeriodLabel}</dt>
+          <dd>{formatCurrency(change.previousCents / 100)}</dd>
+        </div>
+      </dl>
+    </section>
+  )
+}
+
 export function AnalyticsPage() {
   const { query: homeQuery } = useDashboardPeriod()
   const { user } = useAuth()
-  const { hash, state } = useLocation()
+  const { state } = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedView = searchParams.get('vista')
   const view = views.find(({ id }) => id === requestedView)?.id ?? 'egresos'
-  const [currentYear, currentMonthNumber] = dateInGuatemala().split('-').map(Number)
+  const todayDateString = useGuatemalaToday()
+  const [currentYear, currentMonthNumber] = todayDateString.split('-').map(Number)
   const currentPeriod = { anio: currentYear, mes: currentMonthNumber }
   const [periods, setPeriods] = useState(() => {
     const anio = searchParams.get('anio')
@@ -112,24 +157,30 @@ export function AnalyticsPage() {
   const query = new URLSearchParams({ anio: year, mes: month }).toString()
   const viewLabel = views.find(({ id }) => id === view).label
 
+  const comparisonRanges = view === 'egresos' ? getComparisonRanges(year, month, todayDateString) : null
+  const currentExpensesPath = comparisonRanges
+    ? `/egresos?desde=${comparisonRanges.current.desde}&hasta=${comparisonRanges.current.hasta}`
+    : null
+  const previousExpensesPath = comparisonRanges
+    ? `/egresos?desde=${comparisonRanges.previous.desde}&hasta=${comparisonRanges.previous.hasta}`
+    : null
+
   const categories = useAnalyticsRequest(view === 'egresos' ? `/dashboard/egresos-por-categoria?${query}` : null)
   const annual = useAnalyticsRequest(`/dashboard/resumen-anual?anio=${year}`)
+  const currentExpenses = useAnalyticsRequest(currentExpensesPath)
+  const previousExpenses = useAnalyticsRequest(previousExpensesPath)
   const periodLabel = `${monthName(month)} ${year}`
   const currentMonth = annual.data?.find((item) => Number(item.mes) === month)
 
-  useEffect(() => {
-    if (hash !== '#saldo-upcoming-title' || view !== 'egresos') return
-    const frame = requestAnimationFrame(() => {
-      const heading = document.getElementById('saldo-upcoming-title')
-      heading?.focus({ preventScroll: true })
-      heading?.scrollIntoView({ block: 'start' })
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [hash, view])
+  const expenseChange = (!currentExpenses.loading && !previousExpenses.loading && !currentExpenses.error && !previousExpenses.error && comparisonRanges)
+    ? calculateExpenseChange(currentExpenses.data, previousExpenses.data, comparisonRanges.current, comparisonRanges.previous)
+    : null
 
   function refreshExpenses() {
     categories.retry()
     annual.retry()
+    currentExpenses.retry()
+    previousExpenses.retry()
   }
 
   function changePeriod(field, value) {
@@ -185,11 +236,14 @@ export function AnalyticsPage() {
       <div className="saldo-analytics-grid" key={view}>
         <div className="saldo-analytics-month">
           {view === 'egresos' ? (
-            categories.error ? (
-              <AnalyticsError onRetry={categories.retry}>No pudimos cargar los gastos por categoría.</AnalyticsError>
-            ) : (
-              <CategoryExpensesChart data={categories.data} loading={categories.loading} period={periodLabel} />
-            )
+            <>
+              {categories.error ? (
+                <AnalyticsError onRetry={categories.retry}>No pudimos cargar los gastos por categoría.</AnalyticsError>
+              ) : (
+                <CategoryExpensesChart data={categories.data} loading={categories.loading} period={periodLabel} />
+              )}
+              <ExpenseChangeCard change={expenseChange} ranges={comparisonRanges} />
+            </>
           ) : !annual.error && (
             <MonthlyAmount currentMonth={currentMonth} metric={view} periodLabel={periodLabel} loading={annual.loading} />
           )}
